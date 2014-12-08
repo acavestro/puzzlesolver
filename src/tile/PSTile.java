@@ -41,7 +41,7 @@ class PSTile implements Tile {
   }  
 
   public boolean equals(Object o){
-    return o instanceof Tile && symbol.equals(o.toString);
+    return o instanceof Tile && symbol.equals(o.toString());
   }
 
   public int hashCode(){
