@@ -1,17 +1,21 @@
 JFLAGS = -g
 JC = javac
-SRCDIR = src
-BINDIR = bin
-.SUFFIXES: .java .class
-.java.class:
-	$(JC) $(JFLAGS) $*.java -d $(BINDIR)/
+SRC = ./src
+BUILD = ./build
 
-CLASSES = \
-	$(SRCDIR)/PuzzleSolver.java
+CLASSES = Tile \
+		  PSTile \
+		  Puzzle \
+		  PuzzleSolver
 
-default: classes
+SOURCES := $(addprefix $(BUILD)/, $(CLASSES))
+SOURCES := $(addsuffix .java, $(SOURCES))
 
-classes: $(CLASSES:.java=.class)
+
+default: clean
+	mkdir $(BUILD)
+	find $(SRC) -type f -name "*.java" -exec cp {} $(BUILD) \;
+	$(JC) $(JFLAGS) $(SOURCES)
 
 clean:
-	$(RM) $(BINDIR)/*.class
+	rm -rf $(BUILD)
