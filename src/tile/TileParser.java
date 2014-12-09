@@ -7,18 +7,21 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class TileParser {
 
   private final static Charset CHARSET = StandardCharsets.UTF_8;
   private final String DELIM = "\t";
   private Path inputFile;
+  private HashMap<String,Tile> tiles;
 
   public TileParser(String inputFile) {
     this.inputFile = Paths.get(inputFile);
+    this.tiles = new HashMap<String, Tile>();
   }
 
-  public void getTiles() {
+  public HashMap<String,Tile> getTiles() {
     StringBuilder content = new StringBuilder();
     try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
           String line = null;
@@ -28,14 +31,14 @@ public class TileParser {
     } catch (IOException e) {
       System.err.println(e);
     }
-    System.out.println(content.toString());
+    return tiles;
   }
 
   private void parseTile(String line){
     String[] rawTile = line.split(DELIM);
-    for (int i = 0; i < rawTile.length; i++) {
-      System.out.println(rawTile[i]);
-    }
-    //return (Tile) new Object();
+    String id = rawTile[0];
+    Tile t = new PSTile(id, rawTile[1], rawTile[2], rawTile[3], rawTile[4],
+      rawTile[5]);
+    tiles.put(id, t);
   }
 }
