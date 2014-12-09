@@ -5,6 +5,7 @@ BUILD = ./build
 
 CLASSES = Tile \
 		  PSTile \
+		  TileParser \
 		  Puzzle \
 		  PuzzleSolver
 
