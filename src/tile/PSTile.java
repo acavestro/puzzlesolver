@@ -8,8 +8,8 @@ class PSTile implements Tile {
 	private final String idLeft;
 	private final String idRight;
 
-	PSTile(String id, String symbol, String idUp, String idDown, String idLeft,
-		String idRight) {
+	PSTile(String id, String symbol, String idUp, String idRight, String idDown,
+		String idLeft) {
 
     this.id = id;
     this.symbol = symbol;
