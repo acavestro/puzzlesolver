@@ -1,7 +1,7 @@
-JFLAGS = -g
-JC = javac
 SRC = ./src
 BUILD = ./build
+JFLAGS = -g -d $(BUILD)
+JC = javac
 
 CLASSES = Tile \
 		  PSTile \
