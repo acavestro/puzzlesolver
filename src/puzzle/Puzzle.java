@@ -7,5 +7,5 @@ public interface Puzzle {
 	public int getRows();
 	public int getCols();
 
-	public Tile[][] toMatrix();
+	public String toMatrix();
 }
