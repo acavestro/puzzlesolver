@@ -13,7 +13,7 @@ public class PuzzleBuilder {
     this.unsolvedTiles = tiles;
   }
 
-  private ArrayList<Tile> solveFirstColumn(){
+  private Tile[] solveFirstColumn(){
 
     ArrayList<Tile> firstColumn = new ArrayList<Tile>();
     // Search for the first item in top left corner
@@ -50,7 +50,9 @@ public class PuzzleBuilder {
 
     } 
 
-    return firstColumn;
+    return firstColumn.toArray(new Tile[firstColumn.size()]);
+
+  }
 
   }
   }
