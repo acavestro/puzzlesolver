@@ -7,6 +7,7 @@ CLASSES = Tile \
 		  PSTile \
 		  TileParser \
 		  Puzzle \
+		  PSPuzzle \
 		  PuzzleBuilder \
 		  PuzzleSolver
 
