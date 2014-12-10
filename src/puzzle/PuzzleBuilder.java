@@ -75,7 +75,7 @@ public class PuzzleBuilder {
 
   }
 
-  public Tile[][] solvePuzzle() {
+  public Puzzle solvePuzzle() {
     Tile[] firstColumn = solveFirstColumn();
     //TODO: Check che ci sia un elemento qui
     Tile[] firstRow = solveRow(firstColumn[0]);
@@ -88,7 +88,7 @@ public class PuzzleBuilder {
       solution[i] = solveRow(firstColumn[i]);
 
     }
-    return solution;
+    return new PSPuzzle(solution);
   }
 
 }
