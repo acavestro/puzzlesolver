@@ -27,7 +27,7 @@ public class PSPuzzle implements Puzzle {
 
   public String toMatrix() {
 
-    String result = null;
+    String result = "";
 
     for (int i = 0; i < getRows(); i++) {
 
@@ -47,7 +47,7 @@ public class PSPuzzle implements Puzzle {
 
   public String toString() {
 
-    String result = null;
+    String result = "";
 
     for (int i = 0; i < getRows(); i++) {
 
