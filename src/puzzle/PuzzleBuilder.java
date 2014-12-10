@@ -7,15 +7,15 @@ import java.util.Iterator;
 
 public class PuzzleBuilder {
 
-  private HashMap<String, Tile> tiles;
+  private HashMap<String, Tile> unsolvedTiles;
 
   public PuzzleBuilder(HashMap<String, Tile> tiles) {
     this.unsolvedTiles = tiles;
   }
 
-  private void solveFirstRow(){
+  private ArrayList<Tile> solveFirstColumn(){
 
-    ArrayList<Tile> firstRow = new ArrayList<Tile>();
+    ArrayList<Tile> firstColumn = new ArrayList<Tile>();
     // Search for the first item in top left corner
     Iterator i = unsolvedTiles.keySet().iterator();
     boolean found = false;
@@ -27,9 +27,9 @@ public class PuzzleBuilder {
       currentTile = unsolvedTiles.get(currentKey);
 
       if (currentTile.getLeft().equals("VUOTO") && 
-        currentTile.getTop().equals("VUOTO")) {
+        currentTile.getUp().equals("VUOTO")) {
 
-        firstRow.add(currentTile);
+        firstColumn.add(currentTile);
         unsolvedTiles.remove(currentKey);
         found = true;
 
@@ -39,17 +39,20 @@ public class PuzzleBuilder {
 
     // Search the others until the end of line 
     Tile nextTile = null;
-    currentKey = firstRow.get(0).getRight();
+    currentKey = firstColumn.get(0).getDown();
 
     while (!currentKey.equals("VUOTO")) {
     
       nextTile = unsolvedTiles.get(currentKey);
-      firstRow.add(nextTile);
-      currentKey = nextTile.getRight();
+      firstColumn.add(nextTile);
       unsolvedTiles.remove(currentKey);
+      currentKey = nextTile.getDown();
 
     } 
 
+    return firstColumn;
+
+  }
   }
 
 }
