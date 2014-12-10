@@ -54,6 +54,25 @@ public class PuzzleBuilder {
 
   }
 
+  private Tile[] solveRow(Tile start) {
+
+    ArrayList<Tile> row = new ArrayList<Tile>();
+    row.add(start);
+
+    Tile nextTile = null;
+    String currentKey = start.getRight();
+
+    while (!currentKey.equals("VUOTO")) {
+
+      nextTile = unsolvedTiles.get(currentKey);
+      row.add(nextTile);
+      unsolvedTiles.remove(currentKey);
+      currentKey = nextTile.getRight();
+
+    }
+
+    return row.toArray(new Tile[row.size()]);
+
   }
   }
 
