@@ -25,9 +25,23 @@ public class PSPuzzle implements Puzzle {
 
   }
 
-  public Tile[][] toMatrix() {
+  public String toMatrix() {
 
-    return grid;
+    String result = null;
+
+    for (int i = 0; i < getRows(); i++) {
+
+      for (int j = 0; j < getCols(); j++) {
+
+        result = result + grid[i][j];
+
+      }
+
+      result = result + "\n";
+
+    }
+
+    return result;
 
   }
 
