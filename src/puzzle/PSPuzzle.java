@@ -6,7 +6,7 @@ public class PSPuzzle implements Puzzle {
 
   private Tile[][] grid;
 
-  public Puzzle (Tile[][] tiles) {
+  public PSPuzzle (Tile[][] tiles) {
 
     grid = tiles;
 
