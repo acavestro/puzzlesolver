@@ -7,6 +7,7 @@ CLASSES = Tile \
 		  PSTile \
 		  TileParser \
 		  Puzzle \
+		  PuzzleBuilder \
 		  PuzzleSolver
 
 SOURCES := $(addprefix $(BUILD)/, $(CLASSES))
