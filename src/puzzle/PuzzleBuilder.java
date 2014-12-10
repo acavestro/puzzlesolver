@@ -74,6 +74,21 @@ public class PuzzleBuilder {
     return row.toArray(new Tile[row.size()]);
 
   }
+
+  public Tile[][] solvePuzzle() {
+    Tile[] firstColumn = solveFirstColumn();
+    //TODO: Check che ci sia un elemento qui
+    Tile[] firstRow = solveRow(firstColumn[0]);
+
+    Tile[][] solution = new Tile[firstColumn.length][firstRow.length];
+    solution[0] = firstRow;
+
+    for (int i = 1; i < firstColumn.length; i++){
+
+      solution[i] = solveRow(firstColumn[i]);
+
+    }
+    return solution;
   }
 
 }
