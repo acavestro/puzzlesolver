@@ -32,3 +32,11 @@ generator: cleangen
 
 cleangen:
 	rm -f tools/PuzzleGenerator.class
+
+report: cleanreport
+	pdflatex ./report/relazione.tex -output-directory ./
+
+cleanreport:
+	rm -f relazione.pdf
+	find . -name "*.log" -exec rm -f {} \;
+	find ./report -type f -not -name "*.tex" -exec rm -f {} \;
