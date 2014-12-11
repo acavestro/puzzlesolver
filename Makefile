@@ -25,3 +25,9 @@ default: clean
 clean:
 	rm -rf $(BUILD)
 	rm -rf PuzzleSolver.jar
+
+generator: cleangen
+	cd tools; javac PuzzleGenerator.java
+
+cleangen:
+	rm -f tools/PuzzleGenerator.class
