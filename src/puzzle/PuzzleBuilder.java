@@ -39,6 +39,7 @@ public class PuzzleBuilder {
 
     // Search the others until the end of line 
     Tile nextTile = null;
+    // TODO: controllare se firstColumn contiene un elemento
     currentKey = firstColumn.get(0).getDown();
 
     while (!currentKey.equals("VUOTO")) {
