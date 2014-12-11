@@ -20,14 +20,20 @@ public class PuzzleGenerator {
     HashMap<String, Integer> idGen = new HashMap<String, Integer>();
 
     String currentElement;
+    String matrixPuzzle = "";
+    String linePuzzle = "";
+    String currentLinePuzzle = "";
 
     for (int i = 0; i < rows; i++) {
+
+      currentLinePuzzle = "";
 
       for (int j = 0; j < cols; j++) {
 
         tiles[i][j] = alphabet.charAt(r.nextInt(n));
         currentElement = String.valueOf(tiles[i][j]);
         System.out.print(currentElement);
+        currentLinePuzzle = currentLinePuzzle + tiles[i][j];
 
         Integer currentIndex = idGen.get(currentElement);
 
@@ -48,11 +54,15 @@ public class PuzzleGenerator {
 
       }
 
+      linePuzzle = linePuzzle + currentLinePuzzle;
+      matrixPuzzle = matrixPuzzle + currentLinePuzzle + "\n";
       System.out.println();
 
     }
 
     String toInput = "";
+    String currentLine = "";
+    int cont = 1;
 
     for (int i = 0; i < rows; i++) {
 
@@ -80,12 +90,29 @@ public class PuzzleGenerator {
 
     try {
 
-      Files.write(Paths.get(args[2]), toInput.getBytes(), 
-      StandardOpenOption.CREATE);
+      Files.write(Paths.get(args[2]), toInput.getBytes(),
+        StandardOpenOption.CREATE);
 
     } catch (IOException ioe) {
 
-      System.out.println("Non sono riuscito a creare il file");
+      System.out.println("Non sono riuscito a creare il file di input");
+      System.out.println(ioe.getMessage());
+
+    }
+
+    String solutionFileContent = linePuzzle + "\n" +
+                                  "\n" +
+                                  matrixPuzzle + "\n" +
+                                  rows + " " + cols;
+
+    try {
+
+      Files.write(Paths.get(args[3]), solutionFileContent.getBytes(), 
+        StandardOpenOption.CREATE);
+
+    } catch (IOException ioe) {
+
+      System.out.println("Non sono riuscito a creare il file di soluzione");
       System.out.println(ioe.getMessage());
 
     }
