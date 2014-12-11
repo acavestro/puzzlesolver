@@ -14,8 +14,9 @@ CLASSES = Tile \
 SOURCES := $(addprefix $(BUILD)/, $(CLASSES))
 SOURCES := $(addsuffix .java, $(SOURCES))
 
+default: puzzlesolver
 
-default: clean
+puzzlesolver: clean
 	mkdir $(BUILD)
 	find $(SRC) -type f -name "*.java" -exec cp {} $(BUILD) \;
 	$(JC) $(JFLAGS) $(SOURCES)
