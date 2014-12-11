@@ -63,15 +63,16 @@ public class PuzzleGenerator {
         String sud = (i == rows-1) ? "VUOTO" : ids[i+1][j];
         String ovest = (j == 0) ? "VUOTO" : ids[i][j-1];
 
-        toInput = toInput + 
-                  ids[i][j] + "\t" +
-                  tiles[i][j] + "\t" + 
-                  nord + "\t" +
-                  est + "\t" +
-                  sud + "\t" +
-                  ovest + "\n";
+        currentLine = ids[i][j] + "\t" +
+                      tiles[i][j] + "\t" +
+                      nord + "\t" +
+                      est + "\t" +
+                      sud + "\t" +
+                      ovest + "\n";
 
-
+        System.out.print(cont + " " + currentLine);
+        cont++;
+        toInput = toInput + currentLine;
 
       }
 
