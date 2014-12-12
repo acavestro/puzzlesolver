@@ -39,4 +39,4 @@ report: cleanreport
 
 cleanreport:
 	rm -f relazione.pdf
-	find ./report -type f -not -name "*.tex" -exec rm -f {} \;
+	find ./report -type f -not -name "*.tex" -not -name "*.png" -exec rm -f {} \;
