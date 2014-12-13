@@ -45,7 +45,7 @@ public class PSPuzzle implements Puzzle {
 
   }
 
-  public String toString() {
+  public String toLineString() {
 
     String result = "";
 
@@ -60,6 +60,12 @@ public class PSPuzzle implements Puzzle {
     }
 
     return result;
+
+  }
+
+  public String toString() {
+
+    return toLineString();
 
   }
 
