@@ -14,7 +14,12 @@ public class PuzzleSolver {
 
 	public static void main(String[] args) {
 
-    // TODO: check sul primo argomento
+    //TODO: scrivi nella relazione che controllo il numero di parametri
+    if(args.length < 2) {
+      System.out.println("Usage: PuzzleSolver INPUT_FILE OUTPUT_FILE");
+      return;
+    }
+
     TileParser tp = new TileParser(args[0]);
     HashMap<String, Tile> m = tp.getTiles();
 
@@ -28,7 +33,6 @@ public class PuzzleSolver {
                       out.getRows() + " " +
                       out.getCols();
 
-    // TODO: check sul secondo argomento
     Path outputFile = Paths.get(args[1]);
     Charset charset = StandardCharsets.UTF_8;
 
