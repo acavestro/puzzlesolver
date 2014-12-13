@@ -8,5 +8,5 @@ public interface Tile {
   public String getRight();
   public String getID();
   //TODO: aggiornare relazione
-  public String toSymbol();
+  public Object toSymbol();
 }
