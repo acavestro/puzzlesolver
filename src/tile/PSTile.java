@@ -41,7 +41,7 @@ class PSTile implements Tile {
   }  
 
   public String toString(){
-    return toString();
+    return toSymbol();
   }
 
   public boolean equals(Object o){
