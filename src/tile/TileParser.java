@@ -21,7 +21,7 @@ public class TileParser {
     this.tiles = new HashMap<String, Tile>();
   }
 
-  public HashMap<String,Tile> getTiles() {
+  public HashMap<String,Tile> getTiles() throws IrregularTileLineException {
     StringBuilder content = new StringBuilder();
     try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
           String line = null;
@@ -34,8 +34,11 @@ public class TileParser {
     return tiles;
   }
 
-  private void parseTile(String line){
+  private void parseTile(String line) throws IrregularTileLineException {
     String[] rawTile = line.split(DELIM);
+    if (rawTile.length < 6) {
+      throw new IrregularTileLineException();
+    }
     String id = rawTile[0];
     Tile t = new PSTile(id, rawTile[1], rawTile[2], rawTile[3], rawTile[4],
       rawTile[5]);

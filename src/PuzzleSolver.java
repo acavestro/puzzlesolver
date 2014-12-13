@@ -21,7 +21,19 @@ public class PuzzleSolver {
     }
 
     TileParser tp = new TileParser(args[0]);
-    HashMap<String, Tile> m = tp.getTiles();
+    HashMap<String, Tile> m;
+
+    try {
+
+        m = tp.getTiles();
+
+    } catch(IrregularTileLineException itle) {
+
+      System.out.println("ERROR: Some tiles are in a irregular format. " +
+                          "Check input file.\nAborting..");
+      return;
+
+    }
 
     PuzzleBuilder pb = new PuzzleBuilder(m);
     Puzzle out = pb.solvePuzzle();

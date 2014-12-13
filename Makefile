@@ -5,6 +5,7 @@ JC = javac
 
 CLASSES = Tile \
 		  PSTile \
+		  IrregularTileLineException \
 		  TileParser \
 		  Puzzle \
 		  PSPuzzle \
