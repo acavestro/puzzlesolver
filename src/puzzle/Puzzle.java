@@ -10,4 +10,5 @@ public interface Puzzle {
 	//TODO: ho fatto puntare toString a questo qua. Valuta se cambiarlo ovunque.
 	public String toLineString();
 	public String toMatrix();
+
 }
