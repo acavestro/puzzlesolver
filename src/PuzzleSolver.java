@@ -15,7 +15,7 @@ public class PuzzleSolver {
 	public static void main(String[] args) {
 
     //TODO: scrivi nella relazione che controllo il numero di parametri
-    if(args.length < 2) {
+    if(args.length != 2) {
       System.out.println("Usage: PuzzleSolver INPUT_FILE OUTPUT_FILE");
       return;
     }
