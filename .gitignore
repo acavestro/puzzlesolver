@@ -2,3 +2,7 @@ build/
 *.sublime-workspace
 *.jar
 *.class
+report/*
+!report/*.tex
+!report/uml/*
+*.pdf
