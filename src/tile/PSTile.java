@@ -36,9 +36,13 @@ class PSTile implements Tile {
     return id;
   }
 
-  public String toString(){
+  public String toSymbol(){
     return symbol;
   }  
+
+  public String toString(){
+    return toString();
+  }
 
   public boolean equals(Object o){
     return o instanceof Tile && symbol.equals(o.toString());

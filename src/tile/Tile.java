@@ -6,7 +6,7 @@ public interface Tile {
   public String getDown();
   public String getLeft();
   public String getRight();
-
   public String getID();
-
+  //TODO: aggiornare relazione
+  public String toSymbol();
 }
