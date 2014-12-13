@@ -13,7 +13,7 @@ public class PuzzleBuilder {
     this.unsolvedTiles = tiles;
   }
 
-  private Tile[] solveFirstColumn(){
+  private Tile[] solveFirstColumn() throws UnsolvablePuzzle {
 
     ArrayList<Tile> firstColumn = new ArrayList<Tile>();
     // Search for the first item in top left corner
@@ -37,9 +37,16 @@ public class PuzzleBuilder {
 
     }
 
+    // TODO scrivi nella relazione che faccio questo controllo
+    // If firstColumn is empty -> there isn't a top left tile -> puzzle broken
+    if (firstColumn.size() == 0) {
+
+      throw new UnsolvablePuzzle();
+
+    }
+
     // Search the others until the end of line 
     Tile nextTile = null;
-    // TODO: controllare se firstColumn contiene un elemento
     currentKey = firstColumn.get(0).getDown();
 
     while (!currentKey.equals("VUOTO")) {
@@ -55,7 +62,7 @@ public class PuzzleBuilder {
 
   }
 
-  private Tile[] solveRow(Tile start) {
+  private Tile[] solveRow(Tile start) throws UnsolvablePuzzle {
 
     ArrayList<Tile> row = new ArrayList<Tile>();
     row.add(start);
@@ -66,6 +73,13 @@ public class PuzzleBuilder {
     while (!currentKey.equals("VUOTO")) {
 
       nextTile = unsolvedTiles.get(currentKey);
+      // TODO scrivi nella relazione che faccio questo controllo.
+      // if nexTile is null -> there isn't a right piece -> puzzle broken
+      if (nextTile == null) {
+
+        throw new UnsolvablePuzzle();
+
+      }
       row.add(nextTile);
       unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getRight();
@@ -76,7 +90,7 @@ public class PuzzleBuilder {
 
   }
 
-  public Puzzle solvePuzzle() {
+  public Puzzle solvePuzzle() throws UnsolvablePuzzle {
     Tile[] firstColumn = solveFirstColumn();
     //TODO: Check che ci sia un elemento qui
     Tile[] firstRow = solveRow(firstColumn[0]);

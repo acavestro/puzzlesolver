@@ -36,7 +36,19 @@ public class PuzzleSolver {
     }
 
     PuzzleBuilder pb = new PuzzleBuilder(m);
-    Puzzle out = pb.solvePuzzle();
+    Puzzle out;
+
+    try {
+
+      out = pb.solvePuzzle();
+
+    } catch(UnsolvablePuzzle up) {
+
+      System.out.println("ERROR: Missing tiles or wrong coordinates. " +
+                        "Unsolvable puzzle. Check input file.\nAborting... ");
+      return;
+
+    }
 
     String solution = out + "\n" +
                       "\n" +
