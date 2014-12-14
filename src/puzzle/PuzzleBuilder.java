@@ -13,7 +13,7 @@ public class PuzzleBuilder {
     this.unsolvedTiles = tiles;
   }
 
-  private Tile[] solveFirstColumn() throws UnsolvablePuzzle {
+  private Tile[] solveFirstColumn() throws UnsolvablePuzzleException {
 
     ArrayList<Tile> firstColumn = new ArrayList<Tile>();
     // Search for the first item in top left corner
@@ -41,7 +41,7 @@ public class PuzzleBuilder {
     // If firstColumn is empty -> there isn't a top left tile -> puzzle broken
     if (firstColumn.size() == 0) {
 
-      throw new UnsolvablePuzzle();
+      throw new UnsolvablePuzzleException();
 
     }
 
@@ -62,7 +62,7 @@ public class PuzzleBuilder {
 
   }
 
-  private Tile[] solveRow(Tile start) throws UnsolvablePuzzle {
+  private Tile[] solveRow(Tile start) throws UnsolvablePuzzleException {
 
     ArrayList<Tile> row = new ArrayList<Tile>();
     row.add(start);
@@ -77,7 +77,7 @@ public class PuzzleBuilder {
       // if nexTile is null -> there isn't a right piece -> puzzle broken
       if (nextTile == null) {
 
-        throw new UnsolvablePuzzle();
+        throw new UnsolvablePuzzleException();
 
       }
       row.add(nextTile);
@@ -90,7 +90,7 @@ public class PuzzleBuilder {
 
   }
 
-  public Puzzle solvePuzzle() throws UnsolvablePuzzle {
+  public Puzzle solvePuzzle() throws UnsolvablePuzzleException {
     Tile[] firstColumn = solveFirstColumn();
     //firstColumn has at least one element, for sure. Otherwise, 
     // UnsolvablePuzzleException would be thrown by solveFirstColumn().

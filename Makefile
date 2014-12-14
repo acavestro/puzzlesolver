@@ -9,7 +9,7 @@ CLASSES = Tile \
 		  TileParser \
 		  Puzzle \
 		  PSPuzzle \
-		  UnsolvablePuzzle \
+		  UnsolvablePuzzleException \
 		  PuzzleBuilder \
 		  PuzzleSolver
 

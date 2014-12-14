@@ -42,7 +42,7 @@ public class PuzzleSolver {
 
       out = pb.solvePuzzle();
 
-    } catch(UnsolvablePuzzle up) {
+    } catch(UnsolvablePuzzleException upe) {
 
       System.out.println("ERROR: Missing tiles or wrong coordinates. " +
                         "Unsolvable puzzle. Check input file.\nAborting... ");
