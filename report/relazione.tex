@@ -104,7 +104,9 @@
 
         Come si può vedere dalla figura ~\ref{uml:pstile}, la classe PSTile è una banale implementazione dell'interfaccia \verb|Tile|. 
 
-        Da notare la ridefinizione del metodo \verb|toString()|, che ora restituisce il simbolo del pezzo.
+        Da notare la ridefinizione del metodo \verb|toSymbol()| che ora restituisce una stringa come simbolo del pezzo, anziché un \verb|Object| come nella definizione dell'interfaccia. Questo è possibile in quanto \verb|String| è sottotipo di \verb|Object|.
+
+        Inoltre, il metodo \verb|toString| di \verb|PSTile| è fatto puntare al metodo \verb|toSymbol|.
 
       \subsubsection{TileParser}
 
