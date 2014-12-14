@@ -52,7 +52,7 @@ public class PSPuzzle implements Puzzle {
 
   }
 
-  public String toLineString() {
+  public String toLine() {
 
     String result = "";
 
@@ -72,7 +72,7 @@ public class PSPuzzle implements Puzzle {
 
   public String toString() {
 
-    return toLineString();
+    return toLine();
 
   }
 
