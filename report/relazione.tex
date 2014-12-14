@@ -119,7 +119,9 @@
 
         Da notare la ridefinizione del metodo \verb|toSymbol()| che ora restituisce una stringa come simbolo del pezzo, anziché un \verb|Object| come nella definizione dell'interfaccia. Questo è possibile in quanto \verb|String| è sottotipo di \verb|Object|.
 
-        Inoltre, il metodo \verb|toString| di \verb|PSTile| è fatto puntare al metodo \verb|toSymbol|.
+        Il motivo per cui il metodo nell'intefaccia ritorna un oggetto generico è da attribuire alla possibilità di \verb|Tile| di essere implementata da una classe indipendente dal tipo di simbolo. Si pensi ad esempio a puzzle di immagini anziché di stringhe.
+
+        Infine, il metodo \verb|toString| di \verb|PSTile| è fatto puntare al metodo \verb|toSymbol|.
 
       \subsubsection{TileParser}
 
