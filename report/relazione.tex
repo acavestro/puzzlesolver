@@ -168,7 +168,9 @@
 
         \end{figure}
 
-        La classe \verb|PSPuzzle| è una banale implementazione dell'interfaccia \verb|Puzzle|. Da notare che il costruttore richiede come parametro una matrice \verb|Tile[][]| e che l'\emph{override} del metodo \verb|toString()| permette la stampa del puzzle in una singola riga.    
+        La classe \verb|PSPuzzle| è una banale implementazione dell'interfaccia \verb|Puzzle|. Da notare che il costruttore richiede come parametro una matrice \verb|Tile[][]|.
+
+        Inoltre, come per la classe \verb|PSTile|, nonostante il metodo \verb|toLine| nell'interfaccia \verb|Puzzle| chieda di restituire un \verb|Object|, l'implementazione restituisce un oggetto di tipo \verb|String|.  
 
       \subsubsection{PuzzleBuilder}
 
