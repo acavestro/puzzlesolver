@@ -42,3 +42,8 @@ report: cleanreport
 cleanreport:
 	rm -f relazione.pdf
 	find ./report -type f -not -name "*.tex" -not -name "*.png" -exec rm -f {} \;
+
+submit:
+	make puzzlesolver
+	make report
+	rm -rf build report PuzzleSolver.sublime-workspace .*
