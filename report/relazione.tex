@@ -19,6 +19,19 @@
 
     Nella seguente relazione, allegata al progetto, verranno introdotte e discusse tutte le scelte progettuali compiute per lo sviluppo del software.
 
+  \section{Breve descrizione dell'algoritmo}
+
+    In breve, l'algoritmo pensato per risolvere questo problema è il seguente:
+
+    \begin{enumerate}
+
+      \item effettuare il \emph{parsing} dei pezzi presenti nel file di input e salvarli in una struttura dati appropriata (se ne discuterà in seguito)
+      \item trovare l'elemento del puzzle in alto a sinistra, riconoscibile perché l'ID del pezzo a nord e quello a ovest è uguale alla stringa \verb|VUOTO|
+      \item a partire da esso, trovare la prima colonna
+      \item trovare tutte le righe a partire dal primo elemento della colonna ottenuta dal punto precedente
+
+    \end{enumerate}
+
 	\section{Organizzazione delle classi}
 
     Le classi prodotte sono le seguenti:
