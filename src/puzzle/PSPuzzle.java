@@ -20,8 +20,15 @@ public class PSPuzzle implements Puzzle {
 
   public int getCols() {
 
-    // TODO: occhio che esista un elemento in grid
-    return grid[0].length;
+    if (grid.length > 0) {
+
+      return grid[0].length;
+
+    } else {
+
+      return 0;
+
+    }
 
   }
 
