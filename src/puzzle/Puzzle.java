@@ -6,8 +6,6 @@ public interface Puzzle {
 
 	public int getRows();
 	public int getCols();
-	//TODO: aggiornare uml e relazione
-	//TODO: ho fatto puntare toString a questo qua. Valuta se cambiarlo ovunque.
 	public Object toLine();
 	public String toMatrix();
 
