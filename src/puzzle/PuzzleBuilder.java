@@ -92,7 +92,8 @@ public class PuzzleBuilder {
 
   public Puzzle solvePuzzle() throws UnsolvablePuzzle {
     Tile[] firstColumn = solveFirstColumn();
-    //TODO: Check che ci sia un elemento qui
+    //firstColumn has at least one element, for sure. Otherwise, 
+    // UnsolvablePuzzleException would be thrown by solveFirstColumn().
     Tile[] firstRow = solveRow(firstColumn[0]);
 
     Tile[][] solution = new Tile[firstColumn.length][firstRow.length];
