@@ -36,6 +36,7 @@ public class TileParser {
 
   private void parseTile(String line) throws IrregularTileLineException {
     String[] rawTile = line.split(DELIM);
+
     if (rawTile.length != 6) {
       throw new IrregularTileLineException();
     }

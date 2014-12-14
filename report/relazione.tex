@@ -201,4 +201,31 @@
 
         Infine, deve solamente salvare il file di output come da specifica tramite le informazioni messe a disposizione dal contratto di \verb|Puzzle|.
 
+  \section{Gestione degli errori}
+
+    \subsection{Numero di parametri}
+
+      All'interno della classe \verb|PuzzleSolver| viene effettuato un controllo per verificare che il programma sia stato eseguito col corretto numero di parametri. In caso contrario, viene stampato un messaggio che spiega in forma standard l'utilizzo del software dopodiché quest'ultimo si chiude.
+
+    \subsection{Formato dei dati in input}
+
+      Nel metodo \verb|parseLine| della classe \verb|TileParser| viene effettivamente eseguita la conversione del pezzo da stringa a oggetto di tipo \verb|Tile|. Se il numero di pezzi in cui la linea di input può essere spezzata è diverso da quello aspettato, viene lanciata un'eccezione \verb|IrregularTileLineException|. 
+
+      Quest'ultima viene poi rilanciata dal metodo \verb|getTiles| e gestita con un messaggio d'errore all'interno del main di \verb|PuzzleSolver|.
+
+    \subsection{Risolvibilità del puzzle}
+
+      Il puzzle non è risolvibile se esistono riferimenti a pezzi non presenti in input o se i riferimenti stessi sono sbagliati.
+
+      Ci sono due \emph{punti} all'interno di \verb|PuzzleBuilder| in cui è possibile controllare questo errore:
+
+      \begin{itemize}
+
+        \item ricerca del pezzo in alto a sinistra
+        \item completamento di una riga
+
+      \end{itemize}
+
+      Se non si riesce a completare uno qualsiasi dei due punti precedenti, che potremmo chiamare \emph{checkpoint}, viene lanciata \verb|UnsolvablePuzzleException| gestita nel main di \verb|PuzzleSolver|.
+
 \end{document}

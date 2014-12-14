@@ -37,7 +37,6 @@ public class PuzzleBuilder {
 
     }
 
-    // TODO scrivi nella relazione che faccio questo controllo
     // If firstColumn is empty -> there isn't a top left tile -> puzzle broken
     if (firstColumn.size() == 0) {
 
@@ -73,7 +72,7 @@ public class PuzzleBuilder {
     while (!currentKey.equals("VUOTO")) {
 
       nextTile = unsolvedTiles.get(currentKey);
-      // TODO scrivi nella relazione che faccio questo controllo.
+
       // if nexTile is null -> there isn't a right piece -> puzzle broken
       if (nextTile == null) {
 
