@@ -40,7 +40,7 @@ public class PSPuzzle implements Puzzle {
 
       for (int j = 0; j < getCols(); j++) {
 
-        result = result + grid[i][j];
+        result = result + grid[i][j].toSymbol();
 
       }
 
@@ -60,7 +60,7 @@ public class PSPuzzle implements Puzzle {
 
       for (int j = 0; j < getCols(); j++) {
 
-        result = result + grid[i][j];
+        result = result + grid[i][j].toSymbol();
 
       }
 

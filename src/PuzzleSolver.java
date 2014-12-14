@@ -50,7 +50,7 @@ public class PuzzleSolver {
 
     }
 
-    String solution = out + "\n" +
+    String solution = out.toLine() + "\n" +
                       "\n" +
                       out.toMatrix() +
                       "\n" +
