@@ -4,5 +4,5 @@ build/
 *.class
 report/*
 !report/*.tex
-!report/uml/*
+!report/uml
 *.pdf
