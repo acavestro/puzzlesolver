@@ -46,4 +46,4 @@ cleanreport:
 submit:
 	make puzzlesolver
 	make report
-	rm -rf build report PuzzleSolver.sublime-workspace .*
+	rm -rf build report PuzzleSolver.sublime-workspace .DS_Store .git .gitignore
