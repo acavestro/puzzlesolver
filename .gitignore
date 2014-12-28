@@ -6,3 +6,6 @@ report/*
 !report/*.tex
 !report/uml
 *.pdf
+/bin/
+.project
+.classpath
