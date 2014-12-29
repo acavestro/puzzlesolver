@@ -18,7 +18,7 @@ public class TileParserTest {
                                                SecurityException, 
                                                IllegalArgumentException, 
                                                InvocationTargetException {
-    String p = "h2\th\tb1\te3\ti8\t99";
+    String correct = "h2\th\tb1\te3\ti8\t99";
     
     Class<?> parserClass = 
         Class.forName("unipd.cs.p3.puzzlesolver.tile.TileParser");
@@ -29,7 +29,7 @@ public class TileParserTest {
     Method parseTile = parser.getClass().getDeclaredMethod("parseTile", 
                                          parseTileArguments);
     parseTile.setAccessible(true);
-    Tile result = (Tile) parseTile.invoke(parser, p);
+    Tile result = (Tile) parseTile.invoke(parser, correct);
     
     assertEquals("h2", result.getID());
     assertEquals("h", result.toSymbol());
