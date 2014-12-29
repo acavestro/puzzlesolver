@@ -43,9 +43,19 @@ class PSTile implements Tile {
   public String toString(){
     return toSymbol();
   }
+  
+  // TODO inserire in changelog
+  // Attieni metodo equals a contratto definito da Java
 
+  @Override
   public boolean equals(Object o){
-    return o instanceof Tile && symbol.equals(o.toString());
+    if (this == o)
+      return true;
+    if (!(o instanceof Tile))
+      return false;
+    
+    Tile t = (Tile) o;
+    return id.equals(t.getID());
   }
 
   public int hashCode(){
