@@ -22,7 +22,6 @@ public class TileParser {
   }
 
   public HashMap<String,Tile> getTiles() throws IrregularTileLineException {
-    StringBuilder content = new StringBuilder();
     Tile t;
     try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
           String line = null;
