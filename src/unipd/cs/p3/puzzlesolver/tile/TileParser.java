@@ -23,10 +23,12 @@ public class TileParser {
 
   public HashMap<String,Tile> getTiles() throws IrregularTileLineException {
     StringBuilder content = new StringBuilder();
+    Tile t;
     try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
           String line = null;
           while ((line = reader.readLine()) != null) {
-            parseTile(line);
+            t = parseTile(line);
+            tiles.put(t.getID(), t);
           }
     } catch (IOException e) {
       System.err.println(e);
@@ -34,15 +36,15 @@ public class TileParser {
     return tiles;
   }
 
-  private void parseTile(String line) throws IrregularTileLineException {
+  private Tile parseTile(String line) throws IrregularTileLineException {
     String[] rawTile = line.split(DELIM);
 
     if (rawTile.length != 6) {
       throw new IrregularTileLineException();
     }
     String id = rawTile[0];
-    Tile t = new PSTile(id, rawTile[1], rawTile[2], rawTile[3], rawTile[4],
+    return new PSTile(id, rawTile[1], rawTile[2], rawTile[3], rawTile[4],
       rawTile[5]);
-    tiles.put(id, t);
+    
   }
 }
