@@ -39,5 +39,40 @@ public class TileParserTest {
     assertEquals("99", result.getLeft());
     
   }
+  
+  @Test
+  public void parseTileThatShouldNotPass() throws ClassNotFoundException,
+                                               InstantiationException, 
+                                               IllegalAccessException, 
+                                               NoSuchMethodException, 
+                                               SecurityException, 
+                                               IllegalArgumentException {
+    String failed = "hello!";
+    
+    Class<?> parserClass = 
+        Class.forName("unipd.cs.p3.puzzlesolver.tile.TileParser");
+    Constructor<?> c = parserClass.getConstructor(String.class);
+    Object parser = new Object();
+    try {
+      parser = c.newInstance("fakefile.txt");
+    } catch (InvocationTargetException ite) {
+      ite.printStackTrace();
+    }
+    Class<?>[] parseTileArguments = new Class[1];
+    parseTileArguments[0] = String.class;
+    Method parseTile = parser.getClass().getDeclaredMethod("parseTile", 
+                                         parseTileArguments);
+    parseTile.setAccessible(true);
+    boolean failedCheck = false;
+    
+    try {
+      Tile result = (Tile) parseTile.invoke(parser, failed);
+    } catch (InvocationTargetException ite) {
+      failedCheck = true;
+    }
+    
+    assertTrue(failedCheck);
+    
+  }
 
 }
