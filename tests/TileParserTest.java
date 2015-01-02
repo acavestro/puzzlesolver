@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 
 import java.lang.reflect.*;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -73,6 +74,25 @@ public class TileParserTest {
     }
     
     assertTrue(failedCheck);
+    
+  }
+  
+  @Test
+  public void getTilesThatShouldPass() {
+    
+    String okFilePath = "./samples/input_100x100.txt";
+    TileParser tpTest = new TileParser(okFilePath);
+    boolean passed = false;
+    
+    try {
+      HashMap<String, Tile> result = tpTest.getTiles();
+      assertTrue(result.size() == 10000); 
+      passed = true;
+    } catch (IrregularTileLineException e) {
+      passed = false;
+    }
+    
+    assertTrue(passed);
     
   }
 
