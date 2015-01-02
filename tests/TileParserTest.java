@@ -67,7 +67,7 @@ public class TileParserTest {
     boolean failedCheck = false;
     
     try {
-      Tile result = (Tile) parseTile.invoke(parser, failed);
+      parseTile.invoke(parser, failed);
     } catch (InvocationTargetException ite) {
       failedCheck = true;
     }
