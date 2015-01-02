@@ -41,7 +41,8 @@ public class TileParserTest {
   }
   
   @Test
-  public void parseTileThatShouldNotPass() throws ClassNotFoundException,
+  public void parseTileThatShouldRefuseIllegalString() throws 
+                                               ClassNotFoundException,
                                                InstantiationException, 
                                                IllegalAccessException, 
                                                NoSuchMethodException, 
