@@ -96,4 +96,22 @@ public class TileParserTest {
     
   }
 
+  @Test
+  public void getTilesThatShouldRefuseWrongFormatTiles() {
+
+    boolean passed = false;
+    TileParser tpTestFormat = new TileParser(
+                                            "./samples/input_wrong_format.txt");
+
+    try {
+      tpTestFormat.getTiles();
+      passed = false;
+    } catch (IrregularTileLineException e) {
+      passed = true;
+    }
+
+    assertTrue(passed);
+
+  }
+
 }
