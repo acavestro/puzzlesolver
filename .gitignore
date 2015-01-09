@@ -11,3 +11,4 @@ report/*
 .classpath
 .externalToolBuilders
 puzzlesolvershouldwork.txt
+eclipse_build
