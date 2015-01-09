@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.puzzle.PuzzleBuilder;
@@ -24,7 +24,7 @@ public class PuzzleSolver {
     }
 
     final TileParser tp = new TileParser(args[0]);
-    HashMap<String, Tile> m;
+    ConcurrentHashMap<String, Tile> m;
 
     try {
 

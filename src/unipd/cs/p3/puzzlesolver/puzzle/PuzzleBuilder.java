@@ -1,16 +1,16 @@
 package unipd.cs.p3.puzzlesolver.puzzle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import unipd.cs.p3.puzzlesolver.tile.Tile;
 
 public class PuzzleBuilder {
 
-  private final HashMap<String, Tile> unsolvedTiles;
+  private final ConcurrentHashMap<String, Tile> unsolvedTiles;
 
-  public PuzzleBuilder(HashMap<String, Tile> tiles) {
+  public PuzzleBuilder(ConcurrentHashMap<String, Tile> tiles) {
     unsolvedTiles = tiles;
   }
 

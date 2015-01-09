@@ -7,21 +7,22 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TileParser {
 
   private final static Charset CHARSET = StandardCharsets.UTF_8;
   private final String DELIM = "\t";
   private Path inputFile;
-  private HashMap<String,Tile> tiles;
+  private final ConcurrentHashMap<String, Tile> tiles;
 
   public TileParser(String inputFile) {
     this.inputFile = Paths.get(inputFile);
-    this.tiles = new HashMap<String, Tile>();
+    tiles = new ConcurrentHashMap<String, Tile>();
   }
 
-  public HashMap<String,Tile> getTiles() throws IrregularTileLineException {
+  public ConcurrentHashMap<String, Tile> getTiles()
+      throws IrregularTileLineException {
     Tile t;
     try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
           String line = null;

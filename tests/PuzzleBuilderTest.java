@@ -1,7 +1,7 @@
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleThatShouldWorks() {
 
-    HashMap<String, Tile> tiles = new HashMap<String, Tile>();
+    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
 
     try {
       tiles = new TileParser("./samples/input_100x100.txt").getTiles();
@@ -46,7 +46,7 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleShouldRefuseWrongCoordinatesInput() {
 
-    HashMap<String, Tile> tiles = new HashMap<String, Tile>();
+    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
 
     try {
       tiles = new TileParser("./samples/input_wrong_coordinates.txt")
@@ -71,7 +71,7 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleShouldRefuseInputWithoutFirstTile() {
 
-    HashMap<String, Tile> tiles = new HashMap<String, Tile>();
+    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
 
     try {
       tiles = new TileParser("./samples/input_no_first_tile.txt").getTiles();

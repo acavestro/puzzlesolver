@@ -1,7 +1,7 @@
 import static org.junit.Assert.*;
 
 import java.lang.reflect.*;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 
@@ -85,8 +85,8 @@ public class TileParserTest {
     boolean passed = false;
     
     try {
-      HashMap<String, Tile> result = tpTest.getTiles();
-      assertTrue(result.size() == 10000); 
+      ConcurrentHashMap<String, Tile> result = tpTest.getTiles();
+      assertTrue(result.size() == 10000);
       passed = true;
     } catch (IrregularTileLineException e) {
       passed = false;
