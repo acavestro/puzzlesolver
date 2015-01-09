@@ -1,7 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,15 +16,6 @@ public class PuzzleSolverTest {
     final String outName = "./puzzlesolvershouldwork.txt";
     final String inputName = "./samples/input_100x100.txt";
     final String solutionName = "./samples/solution_100x100.txt";
-
-    // Cancello file se presente
-    final File outFile = new File(outName);
-
-    if (outFile.exists()) {
-      if (outFile.delete()) {
-        fail("File esistente e fallita cancellazione");
-      }
-    }
 
     // Invoco main
 
