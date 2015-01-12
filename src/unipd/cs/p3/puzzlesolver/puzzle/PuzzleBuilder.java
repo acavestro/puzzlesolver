@@ -62,6 +62,35 @@ public class PuzzleBuilder {
 
   }
 
+  private class RowSolverThread extends Thread {
+    private Tile start;
+    private Tile[] result;
+    private boolean error;
+
+    public RowSolverThread(Tile start) {
+      this.start = start;
+      result = null;
+      error = false;
+    }
+
+    @Override
+    public void run() {
+      try {
+        result = solveRow(start);
+      } catch (UnsolvablePuzzleException e) {
+        error = true;
+      }
+    }
+
+    public Tile[] getRow() {
+      return result;
+    }
+
+    public boolean hasFailed() {
+      return error;
+    }
+  }
+
   private Tile[] solveRow(Tile start) throws UnsolvablePuzzleException {
 
     final ArrayList<Tile> row = new ArrayList<Tile>();
@@ -81,6 +110,10 @@ public class PuzzleBuilder {
 
       }
       row.add(nextTile);
+      // ConcurrentHashMap is thread-safe
+      // If the puzzle is well-formed, a deletion of a Tile cannot interfere
+      // with other thread. Otherwise, a thread wouldn't manage to retrieve a
+      // Tile and it would throw a UnsolvablePuzzleException.
       unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getRight();
 
@@ -92,18 +125,29 @@ public class PuzzleBuilder {
 
   public Puzzle solvePuzzle() throws UnsolvablePuzzleException {
     final Tile[] firstColumn = solveFirstColumn();
-    // firstColumn has at least one element, for sure. Otherwise,
-    // UnsolvablePuzzleException would be thrown by solveFirstColumn().
-    final Tile[] firstRow = solveRow(firstColumn[0]);
 
-    final Tile[][] solution = new Tile[firstColumn.length][firstRow.length];
-    solution[0] = firstRow;
+    RowSolverThread[] rowWorkers = new RowSolverThread[firstColumn.length];
 
-    for (int i = 1; i < firstColumn.length; i++) {
-
-      solution[i] = solveRow(firstColumn[i]);
-
+    for (int i = 0; i < rowWorkers.length; i++) {
+      rowWorkers[i] = new RowSolverThread(firstColumn[i]);
+      rowWorkers[i].start();
+      try {
+        rowWorkers[i].join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
+
+    final Tile[][] solution = new Tile[firstColumn.length][rowWorkers[0]
+        .getRow().length];
+
+    for (int i = 0; i < rowWorkers.length; i++) {
+      if (rowWorkers[i].hasFailed()) {
+        throw new UnsolvablePuzzleException();
+      }
+      solution[i] = rowWorkers[i].getRow();
+    }
+
     return new PSPuzzle(solution);
   }
 
