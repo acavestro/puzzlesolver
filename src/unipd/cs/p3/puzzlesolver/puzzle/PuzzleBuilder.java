@@ -163,6 +163,7 @@ public class PuzzleBuilder {
 
     try {
       results = solveWorkers.invokeAll(linesToSolve);
+      solveWorkers.shutdown();
 
       if (firstColumn.length >= firstRow.length) {
         solution[0] = firstRow;
@@ -190,6 +191,7 @@ public class PuzzleBuilder {
       }
     }
 
+    solveWorkers.shutdownNow();
     return new PSPuzzle(solution);
 
   }
