@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TileParser {
 
   private final static Charset CHARSET = StandardCharsets.UTF_8;
-  private final String DELIM = "\t";
+  private static final String DELIM = "\t";
   private Path inputFile;
   private final ConcurrentHashMap<String, Tile> tiles;
 
@@ -24,12 +24,13 @@ public class TileParser {
   public ConcurrentHashMap<String, Tile> getTiles()
       throws IrregularTileLineException {
     Tile t;
-    try (BufferedReader reader = Files.newBufferedReader(inputFile, CHARSET)) {
-          String line = null;
-          while ((line = reader.readLine()) != null) {
-            t = parseTile(line);
-            tiles.put(t.getID(), t);
-          }
+    try (BufferedReader reader = Files.newBufferedReader(inputFile,
+        CHARSET)) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        t = parseTile(line);
+        tiles.put(t.getID(), t);
+      }
     } catch (IOException e) {
       System.err.println(e);
     }
@@ -43,8 +44,8 @@ public class TileParser {
       throw new IrregularTileLineException();
     }
     String id = rawTile[0];
-    return new PSTile(id, rawTile[1], rawTile[2], rawTile[3], rawTile[4],
-      rawTile[5]);
-    
+    return new PSTile(id, rawTile[1], rawTile[2], rawTile[3],
+        rawTile[4], rawTile[5]);
+
   }
 }
