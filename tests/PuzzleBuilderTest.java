@@ -1,11 +1,16 @@
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 
-import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.puzzle.PuzzleBuilder;
 import unipd.cs.p3.puzzlesolver.puzzle.UnsolvablePuzzleException;
 import unipd.cs.p3.puzzlesolver.tile.IrregularTileLineException;
@@ -17,28 +22,24 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleThatShouldWorks() {
 
-    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
+    final String outName = "./puzzlesolvershouldwork.txt";
+    final String inputName = "./samples/input_100x100.txt";
+    final String solutionName = "./samples/solution_100x100.txt";
+
+    // Invoco main
+
+    PuzzleSolver.main(new String[] { inputName, outName });
+
+    // Controllo il risultato.
+
+    final Path outPath = Paths.get(outName);
+    final Path solutionPath = Paths.get(solutionName);
 
     try {
-      tiles = new TileParser("./samples/input_100x100.txt").getTiles();
-    } catch (final IrregularTileLineException e) {
-      fail(e.getStackTrace().toString());
-    }
-
-    final PuzzleBuilder pb = new PuzzleBuilder(tiles);
-    Puzzle p = null;
-
-    try {
-      p = pb.solvePuzzle();
-    } catch (final UnsolvablePuzzleException e) {
-      fail(e.getStackTrace().toString());
-    }
-
-    if (p != null) {
-      assertTrue(p.getCols() == 100);
-      assertTrue(p.getRows() == 100);
-    } else {
-      fail("Puzzle is null");
+      assertEquals(Files.readAllLines(outPath),
+          Files.readAllLines(solutionPath));
+    } catch (final IOException e) {
+      fail(Arrays.toString(e.getStackTrace()));
     }
 
   }
@@ -46,13 +47,13 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleShouldRefuseWrongCoordinatesInput() {
 
-    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
+    ConcurrentHashMap<String, Tile> tiles = null;
 
     try {
       tiles = new TileParser("./samples/input_wrong_coordinates.txt")
-          .getTiles();
+      .getTiles();
     } catch (final IrregularTileLineException e) {
-      fail(e.getStackTrace().toString());
+      fail(Arrays.toString(e.getStackTrace()));
     }
 
     final PuzzleBuilder pb = new PuzzleBuilder(tiles);
@@ -71,12 +72,13 @@ public class PuzzleBuilderTest {
   @Test
   public void solvePuzzleShouldRefuseInputWithoutFirstTile() {
 
-    ConcurrentHashMap<String, Tile> tiles = new ConcurrentHashMap<String, Tile>();
+    ConcurrentHashMap<String, Tile> tiles = null;
 
     try {
-      tiles = new TileParser("./samples/input_no_first_tile.txt").getTiles();
+      tiles = new TileParser("./samples/input_no_first_tile.txt")
+          .getTiles();
     } catch (final IrregularTileLineException e) {
-      fail(e.getStackTrace().toString());
+      fail(Arrays.toString(e.getStackTrace()));
     }
 
     final PuzzleBuilder pb = new PuzzleBuilder(tiles);
