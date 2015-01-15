@@ -20,51 +20,51 @@ public class PuzzleBuilder {
     unsolvedTiles = tiles;
   }
 
-  private Tile[] solveFirstColumn() throws UnsolvablePuzzleException {
+  private Tile findTopLeftTile() throws UnsolvablePuzzleException {
 
-    final ArrayList<Tile> firstColumn = new ArrayList<Tile>();
-    // Search for the first item in top left corner
     final Iterator<String> i = unsolvedTiles.keySet().iterator();
     boolean found = false;
     String currentKey = null;
     Tile currentTile = null;
-    while (i.hasNext() && !found) {
 
+    while (i.hasNext() && !found) {
       currentKey = i.next().toString();
       currentTile = unsolvedTiles.get(currentKey);
 
       if (currentTile.getLeft().equals("VUOTO")
           && currentTile.getUp().equals("VUOTO")) {
 
-        firstColumn.add(currentTile);
         unsolvedTiles.remove(currentKey);
         found = true;
-
       }
-
     }
 
-    // If firstColumn is empty -> there isn't a top left tile -> puzzle broken
-    if (firstColumn.size() == 0) {
-
+    if (found) {
+      return currentTile;
+    } else {
       throw new UnsolvablePuzzleException();
-
     }
+  }
 
-    // Search the others until the end of line
+  private Tile[] solveColumn(Tile start)
+      throws UnsolvablePuzzleException {
+
+    final ArrayList<Tile> column = new ArrayList<Tile>();
+    column.add(start);
+    String currentKey = null;
     Tile nextTile = null;
-    currentKey = firstColumn.get(0).getDown();
+    currentKey = start.getDown();
 
     while (!currentKey.equals("VUOTO")) {
-    
+
       nextTile = unsolvedTiles.get(currentKey);
-      firstColumn.add(nextTile);
+      column.add(nextTile);
       unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getDown();
 
     }
 
-    return firstColumn.toArray(new Tile[firstColumn.size()]);
+    return column.toArray(new Tile[column.size()]);
 
   }
 
@@ -118,7 +118,7 @@ public class PuzzleBuilder {
   }
 
   public Puzzle solvePuzzle() throws UnsolvablePuzzleException {
-    final Tile[] firstColumn = solveFirstColumn();
+    final Tile[] firstColumn = solveColumn(findTopLeftTile());
 
     // Best practices evidence that an optimum number of threads is NCPU + 1
     ExecutorService rowWorkers = Executors.newFixedThreadPool(Runtime
