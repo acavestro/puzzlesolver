@@ -1,23 +1,25 @@
 package unipd.cs.p3.puzzlesolver.puzzle;
 
-import unipd.cs.p3.puzzlesolver.tile.Tile; 
+import unipd.cs.p3.puzzlesolver.tile.Tile;
 
 public class PSPuzzle implements Puzzle {
 
   private Tile[][] grid;
 
-  PSPuzzle (Tile[][] tiles) {
+  PSPuzzle(Tile[][] tiles) {
 
     grid = tiles;
 
   }
 
+  @Override
   public int getRows() {
 
     return grid.length;
 
   }
 
+  @Override
   public int getCols() {
 
     if (grid.length > 0) {
@@ -32,44 +34,47 @@ public class PSPuzzle implements Puzzle {
 
   }
 
+  @Override
   public String toMatrix() {
 
-    String result = "";
+    StringBuffer b = new StringBuffer();
 
     for (int i = 0; i < getRows(); i++) {
 
       for (int j = 0; j < getCols(); j++) {
 
-        result = result + grid[i][j].toSymbol();
+        b.append(grid[i][j].toSymbol());
 
       }
 
-      result = result + "\n";
+      b.append("\n");
 
     }
 
-    return result;
+    return b.toString();
 
   }
 
+  @Override
   public String toLine() {
 
-    String result = "";
+    StringBuffer b = new StringBuffer();
 
     for (int i = 0; i < getRows(); i++) {
 
       for (int j = 0; j < getCols(); j++) {
 
-        result = result + grid[i][j].toSymbol();
+        b.append(grid[i][j].toSymbol());
 
       }
 
     }
 
-    return result;
+    return b.toString();
 
   }
 
+  @Override
   public String toString() {
 
     return toLine();
