@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.HashMap;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -7,82 +6,72 @@ import java.nio.file.StandardOpenOption;
 
 public class PuzzleGenerator {
 
-  public static void main (String[] args) {
+  public static void main(String[] args) {
 
+    if (args.length != 4) {
+      System.out
+          .println("Usage: PuzzleGenerator ROWS COLS OUTPUT OUTPUT_SOL");
+      System.exit(-1);
+    }
     final String alphabet = "abcdefghilmnopqrstuvz1234567890_-";
-    final int n = alphabet.length(); 
+    final int n = alphabet.length();
     Random r = new Random();
 
     int rows = Integer.parseInt(args[0]);
     int cols = Integer.parseInt(args[1]);
     char[][] tiles = new char[rows][cols];
-    String[][] ids = new String[rows][cols];
-    HashMap<String, Integer> idGen = new HashMap<String, Integer>();
+    int[][] ids = new int[rows][cols];
 
-    String currentElement;
-    String matrixPuzzle = "";
-    String linePuzzle = "";
-    String currentLinePuzzle = "";
+    StringBuffer matrixPuzzle = new StringBuffer();
+    StringBuffer linePuzzle = new StringBuffer();
+    int indexCounter = 0;
+    int lineLength;
 
     for (int i = 0; i < rows; i++) {
 
-      currentLinePuzzle = "";
-
+      lineLength = 0;
       for (int j = 0; j < cols; j++) {
 
         tiles[i][j] = alphabet.charAt(r.nextInt(n));
-        currentElement = String.valueOf(tiles[i][j]);
-        System.out.print(currentElement);
-        currentLinePuzzle = currentLinePuzzle + tiles[i][j];
+        System.out.print(tiles[i][j]);
+        linePuzzle.append(tiles[i][j]);
 
-        Integer currentIndex = idGen.get(currentElement);
-
-        if (currentIndex != null) {
-
-          int intCurrentIndex = currentIndex.intValue();
-          idGen.put(currentElement, new Integer(intCurrentIndex + 1));
-          ids[i][j] = currentElement + Integer.toString(intCurrentIndex + 1);
-
-        } else {
-
-          idGen.put(currentElement, new Integer(1));
-          ids[i][j] = currentElement + "1";
-
-        }
-
-        //System.out.print("(" + ids[i][j] + ") ");
+        ids[i][j] = indexCounter;
+        indexCounter++;
+        lineLength++;
 
       }
 
-      linePuzzle = linePuzzle + currentLinePuzzle;
-      matrixPuzzle = matrixPuzzle + currentLinePuzzle + "\n";
+      matrixPuzzle.append(
+          linePuzzle.substring(indexCounter - lineLength)).append("\n");
       System.out.println();
 
     }
 
-    String toInput = "";
-    String currentLine = "";
+    StringBuffer inputContent = new StringBuffer();
+    StringBuffer currentLine = new StringBuffer();
     int cont = 1;
+    String nord, est, sud, ovest;
 
     for (int i = 0; i < rows; i++) {
 
       for (int j = 0; j < cols; j++) {
 
-        String nord = (i == 0) ? "VUOTO" : ids[i-1][j];
-        String est = (j == cols-1) ? "VUOTO" : ids[i][j+1];
-        String sud = (i == rows-1) ? "VUOTO" : ids[i+1][j];
-        String ovest = (j == 0) ? "VUOTO" : ids[i][j-1];
+        currentLine.setLength(0);
 
-        currentLine = ids[i][j] + "\t" +
-                      tiles[i][j] + "\t" +
-                      nord + "\t" +
-                      est + "\t" +
-                      sud + "\t" +
-                      ovest + "\n";
+        nord = i == 0 ? "VUOTO" : String.valueOf(ids[i - 1][j]);
+        est = j == cols - 1 ? "VUOTO" : String.valueOf(ids[i][j + 1]);
+        sud = i == rows - 1 ? "VUOTO" : String.valueOf(ids[i + 1][j]);
+        ovest = j == 0 ? "VUOTO" : String.valueOf(ids[i][j - 1]);
+
+        currentLine.append(ids[i][j]).append("\t").append(tiles[i][j])
+            .append("\t").append(nord).append("\t").append(est)
+            .append("\t").append(sud).append("\t").append(ovest)
+            .append("\n");
 
         System.out.print(cont + " " + currentLine);
         cont++;
-        toInput = toInput + currentLine;
+        inputContent.append(currentLine);
 
       }
 
@@ -90,8 +79,8 @@ public class PuzzleGenerator {
 
     try {
 
-      Files.write(Paths.get(args[2]), toInput.getBytes(),
-        StandardOpenOption.CREATE);
+      Files.write(Paths.get(args[2]), inputContent.toString()
+          .getBytes(), StandardOpenOption.CREATE);
 
     } catch (IOException ioe) {
 
@@ -100,19 +89,20 @@ public class PuzzleGenerator {
 
     }
 
-    String solutionFileContent = linePuzzle + "\n" +
-                                  "\n" +
-                                  matrixPuzzle + "\n" +
-                                  rows + " " + cols;
+    StringBuffer solutionFileContent = new StringBuffer();
+    solutionFileContent.append(linePuzzle).append("\n").append("\n")
+        .append(matrixPuzzle).append("\n").append(rows).append(" ")
+        .append(cols);
 
     try {
 
-      Files.write(Paths.get(args[3]), solutionFileContent.getBytes(), 
-        StandardOpenOption.CREATE);
+      Files.write(Paths.get(args[3]), solutionFileContent.toString()
+          .getBytes(), StandardOpenOption.CREATE);
 
     } catch (IOException ioe) {
 
-      System.out.println("Non sono riuscito a creare il file di soluzione");
+      System.out
+          .println("Non sono riuscito a creare il file di soluzione");
       System.out.println(ioe.getMessage());
 
     }
