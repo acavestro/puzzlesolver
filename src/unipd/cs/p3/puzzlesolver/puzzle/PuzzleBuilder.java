@@ -2,7 +2,13 @@ package unipd.cs.p3.puzzlesolver.puzzle;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import unipd.cs.p3.puzzlesolver.tile.Tile;
 
@@ -62,33 +68,21 @@ public class PuzzleBuilder {
 
   }
 
-  private class RowSolverThread extends Thread {
+  private class RowSolverTask implements Callable<Tile[]> {
     private Tile start;
-    private Tile[] result;
-    private boolean error;
 
-    public RowSolverThread(Tile start) {
+    public RowSolverTask(Tile start) {
       this.start = start;
-      result = null;
-      error = false;
     }
 
     @Override
-    public void run() {
-      try {
-        result = solveRow(start);
-      } catch (UnsolvablePuzzleException e) {
-        error = true;
-      }
-    }
+    public Tile[] call() throws UnsolvablePuzzleException {
+      Tile[] result = null;
 
-    public Tile[] getRow() {
+      result = solveRow(start);
       return result;
     }
 
-    public boolean hasFailed() {
-      return error;
-    }
   }
 
   private Tile[] solveRow(Tile start) throws UnsolvablePuzzleException {
@@ -126,29 +120,34 @@ public class PuzzleBuilder {
   public Puzzle solvePuzzle() throws UnsolvablePuzzleException {
     final Tile[] firstColumn = solveFirstColumn();
 
-    RowSolverThread[] rowWorkers = new RowSolverThread[firstColumn.length];
+    // Best practices evidence that an optimum number of threads is NCPU + 1
+    ExecutorService rowWorkers = Executors.newFixedThreadPool(Runtime
+        .getRuntime().availableProcessors() + 1);
+    List<Callable<Tile[]>> rowsToSolve = new ArrayList<Callable<Tile[]>>();
 
-    for (int i = 0; i < rowWorkers.length; i++) {
-      rowWorkers[i] = new RowSolverThread(firstColumn[i]);
-      rowWorkers[i].start();
-      try {
-        rowWorkers[i].join();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+    for (Tile element : firstColumn) {
+      rowsToSolve.add(new RowSolverTask(element));
     }
 
-    final Tile[][] solution = new Tile[firstColumn.length][rowWorkers[0]
-        .getRow().length];
+    List<Future<Tile[]>> results;
+    List<Tile[]> solution = new ArrayList<Tile[]>();
 
-    for (int i = 0; i < rowWorkers.length; i++) {
-      if (rowWorkers[i].hasFailed()) {
+    try {
+      results = rowWorkers.invokeAll(rowsToSolve);
+
+      for (Future<Tile[]> res : results) {
+        solution.add(res.get());
+      }
+
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      if (e.getCause() instanceof UnsolvablePuzzleException) {
         throw new UnsolvablePuzzleException();
       }
-      solution[i] = rowWorkers[i].getRow();
     }
 
-    return new PSPuzzle(solution);
+    return new PSPuzzle(
+        solution.toArray(new Tile[firstColumn.length][solution.get(0).length]));
   }
-
 }
