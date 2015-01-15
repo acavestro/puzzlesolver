@@ -28,7 +28,7 @@ public class PuzzleBuilder {
     Tile currentTile = null;
 
     while (i.hasNext() && !found) {
-      currentKey = i.next().toString();
+      currentKey = i.next();
       currentTile = unsolvedTiles.get(currentKey);
 
       if (currentTile.getLeft().equals("VUOTO")
@@ -58,6 +58,9 @@ public class PuzzleBuilder {
     while (!currentKey.equals("VUOTO")) {
 
       nextTile = unsolvedTiles.get(currentKey);
+      if (nextTile == null) {
+        throw new UnsolvablePuzzleException();
+      }
       column.add(nextTile);
       unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getDown();
@@ -80,6 +83,23 @@ public class PuzzleBuilder {
       Tile[] result = null;
 
       result = solveRow(start);
+      return result;
+    }
+
+  }
+
+  private class ColumnSolverTask implements Callable<Tile[]> {
+    private Tile start;
+
+    public ColumnSolverTask(Tile start) {
+      this.start = start;
+    }
+
+    @Override
+    public Tile[] call() throws UnsolvablePuzzleException {
+      Tile[] result = null;
+
+      result = solveColumn(start);
       return result;
     }
 
@@ -119,24 +139,47 @@ public class PuzzleBuilder {
 
   public Puzzle solvePuzzle() throws UnsolvablePuzzleException {
     final Tile[] firstColumn = solveColumn(findTopLeftTile());
+    final Tile[] firstRow = solveRow(firstColumn[0]);
 
     // Best practices evidence that an optimum number of threads is NCPU + 1
-    ExecutorService rowWorkers = Executors.newFixedThreadPool(Runtime
+    ExecutorService solveWorkers = Executors.newFixedThreadPool(Runtime
         .getRuntime().availableProcessors() + 1);
-    List<Callable<Tile[]>> rowsToSolve = new ArrayList<Callable<Tile[]>>();
+    List<Callable<Tile[]>> linesToSolve = new ArrayList<Callable<Tile[]>>();
+    Tile[][] solution = new Tile[firstColumn.length][firstRow.length];
 
-    for (Tile element : firstColumn) {
-      rowsToSolve.add(new RowSolverTask(element));
+    if (firstColumn.length >= firstRow.length) {
+      // It's more efficient to solve rows
+      for (int i = 1; i < firstColumn.length; i++) {
+        linesToSolve.add(new RowSolverTask(firstColumn[i]));
+      }
+    } else {
+      // solution.add(firstColumn);
+      for (int i = 1; i < firstRow.length; i++) {
+        linesToSolve.add(new ColumnSolverTask(firstRow[i]));
+      }
     }
 
     List<Future<Tile[]>> results;
-    List<Tile[]> solution = new ArrayList<Tile[]>();
 
     try {
-      results = rowWorkers.invokeAll(rowsToSolve);
+      results = solveWorkers.invokeAll(linesToSolve);
 
-      for (Future<Tile[]> res : results) {
-        solution.add(res.get());
+      if (firstColumn.length >= firstRow.length) {
+        solution[0] = firstRow;
+        for (int i = 1; i < firstColumn.length; i++) {
+          solution[i] = results.get(i - 1).get();
+        }
+      } else {
+        for (int i = 0; i < firstColumn.length; i++) {
+          solution[i][0] = firstColumn[i];
+        }
+        Tile[] t;
+        for (int i = 1; i < firstRow.length; i++) {
+          t = results.get(i - 1).get();
+          for (int j = 0; j < firstColumn.length; j++) {
+            solution[j][i] = t[j];
+          }
+        }
       }
 
     } catch (InterruptedException e) {
@@ -147,7 +190,7 @@ public class PuzzleBuilder {
       }
     }
 
-    return new PSPuzzle(
-        solution.toArray(new Tile[firstColumn.length][solution.get(0).length]));
+    return new PSPuzzle(solution);
+
   }
 }
