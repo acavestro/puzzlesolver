@@ -32,8 +32,9 @@ public class PuzzleSolver {
 
     } catch (final IrregularTileLineException itle) {
 
-      System.out.println("ERROR: Some tiles are in a irregular format. "
-          + "Check input file.\nAborting..");
+      System.out
+          .println("ERROR: Some tiles are in a irregular format. "
+              + "Check input file.\nAborting..");
       return;
 
     }
@@ -49,17 +50,19 @@ public class PuzzleSolver {
 
       System.out.println("ERROR: Missing tiles or wrong coordinates. "
           + "Unsolvable puzzle. Check input file.\nAborting... ");
+      System.out.println(upe.getMessage());
       return;
 
     }
 
-    final String solution = out.toLine() + "\n" + "\n" + out.toMatrix() + "\n"
-        + out.getRows() + " " + out.getCols();
+    final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()
+        + "\n" + out.getRows() + " " + out.getCols();
 
     final Path outputFile = Paths.get(args[1]);
     final Charset charset = StandardCharsets.UTF_8;
 
-    try (BufferedWriter writer = Files.newBufferedWriter(outputFile, charset)) {
+    try (BufferedWriter writer = Files.newBufferedWriter(outputFile,
+        charset)) {
 
       writer.write(solution);
 

@@ -42,7 +42,7 @@ public class PuzzleBuilder {
     if (found) {
       return currentTile;
     } else {
-      throw new UnsolvablePuzzleException();
+      throw new UnsolvablePuzzleException("Top left element not found");
     }
   }
 
@@ -59,7 +59,8 @@ public class PuzzleBuilder {
 
       nextTile = unsolvedTiles.get(currentKey);
       if (nextTile == null) {
-        throw new UnsolvablePuzzleException();
+        throw new UnsolvablePuzzleException(
+            "No next tile found in column solving");
       }
       column.add(nextTile);
       unsolvedTiles.remove(currentKey);
@@ -120,7 +121,8 @@ public class PuzzleBuilder {
       // if nexTile is null -> there isn't a right piece -> puzzle broken
       if (nextTile == null) {
 
-        throw new UnsolvablePuzzleException();
+        throw new UnsolvablePuzzleException(
+            "No next tile found in rows solving");
 
       }
       row.add(nextTile);
@@ -184,10 +186,12 @@ public class PuzzleBuilder {
       }
 
     } catch (InterruptedException e) {
+      System.out
+          .println("Interrupted exception happened in the thread pool");
       e.printStackTrace();
     } catch (ExecutionException e) {
       if (e.getCause() instanceof UnsolvablePuzzleException) {
-        throw new UnsolvablePuzzleException();
+        throw new UnsolvablePuzzleException(e.getMessage());
       }
     }
 
