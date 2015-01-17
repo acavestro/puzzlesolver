@@ -18,7 +18,14 @@ public class TileParser {
 
   public TileParser(String inputFile) {
     this.inputFile = Paths.get(inputFile);
-    tiles = new ConcurrentHashMap<String, Tile>();
+    /*
+     * An initial capacity of 16 ensures a reasonably good number of elements
+     * before resizing happens. Load factor of 0.9 ensures a dense packaging
+     * inside ConcurrentHashMap which will optimize memory use. And
+     * concurrencyLevel set to 1 will ensure that only one shard is created and
+     * maintained.
+     */
+    tiles = new ConcurrentHashMap<String, Tile>(16, 0.9f, 1);
   }
 
   public ConcurrentHashMap<String, Tile> getTiles()
