@@ -12,3 +12,6 @@ report/*
 .externalToolBuilders
 puzzlesolvershouldwork.txt
 eclipse_build
+out.txt
+benchmark/*
+!benchmark/README

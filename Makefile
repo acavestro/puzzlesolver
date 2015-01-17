@@ -47,3 +47,7 @@ submit:
 	make puzzlesolver
 	make report
 	rm -rf build report PuzzleSolver.sublime-workspace .DS_Store .git .gitignore
+
+benchmark: puzzlesolver
+	cp src/PuzzleBenchmark.java $(BUILD)
+	cd $(BUILD); javac PuzzleBenchmark.java; jar cfe ../PuzzleBenchmark.jar PuzzleBenchmark ./*
