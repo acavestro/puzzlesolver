@@ -53,17 +53,18 @@ public class PuzzleBuilder {
     column.add(start);
     String currentKey = null;
     Tile nextTile = null;
+    Tile backCheck = null;
     currentKey = start.getDown();
 
     while (!currentKey.equals("VUOTO")) {
 
       nextTile = unsolvedTiles.get(currentKey);
-      if (nextTile == null) {
+      backCheck = unsolvedTiles.remove(currentKey);
+      if (nextTile == null || backCheck == null) {
         throw new UnsolvablePuzzleException(
             "No next tile found in column solving");
       }
       column.add(nextTile);
-      unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getDown();
 
     }
@@ -112,25 +113,22 @@ public class PuzzleBuilder {
     row.add(start);
 
     Tile nextTile = null;
+    Tile backCheck = null;
     String currentKey = start.getRight();
 
     while (!currentKey.equals("VUOTO")) {
 
       nextTile = unsolvedTiles.get(currentKey);
+      backCheck = unsolvedTiles.remove(currentKey);
 
       // if nexTile is null -> there isn't a right piece -> puzzle broken
-      if (nextTile == null) {
+      if (nextTile == null || backCheck == null) {
 
         throw new UnsolvablePuzzleException(
             "No next tile found in rows solving");
 
       }
       row.add(nextTile);
-      // ConcurrentHashMap is thread-safe
-      // If the puzzle is well-formed, a deletion of a Tile cannot interfere
-      // with other thread. Otherwise, a thread wouldn't manage to retrieve a
-      // Tile and it would throw a UnsolvablePuzzleException.
-      unsolvedTiles.remove(currentKey);
       currentKey = nextTile.getRight();
 
     }
