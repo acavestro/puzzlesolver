@@ -36,12 +36,12 @@ cleangen:
 	rm -f tools/PuzzleGenerator.class
 
 report: cleanreport
-	cd ./report; pdflatex relazione.tex; pdflatex relazione.tex
+	cd ./report; pdflatex relazione.tex; bibtex relazione.aux; pdflatex relazione.tex; pdflatex relazione.tex
 	mv ./report/relazione.pdf ./relazione.pdf
 
 cleanreport:
 	rm -f relazione.pdf
-	find ./report -type f -not -name "*.tex" -not -name "*.png" -exec rm -f {} \;
+	find ./report -type f -not -name "*.tex" -not -name "*.bib" -not -name "*.png" -exec rm -f {} \;
 
 submit:
 	make puzzlesolver

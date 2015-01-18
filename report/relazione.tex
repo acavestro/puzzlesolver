@@ -1,243 +1,229 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage[round]{natbib}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{float}
 \frenchspacing
+\newcommand{\strong}[1]{ \textbf{#1}}
 
-\title{Programmazione Concorrente e Distribuita \\ A.A. 2014/2015 \\ \vspace{2 mm} {\small PuzzleSolver - Parte 1}}
+\title{Programmazione Concorrente e Distribuita \\ A.A. 2014/2015 \\
+\vspace{2 mm}{\small PuzzleSolver - Parte 2}}
 \author{Antonio Cavestro \\ \vspace{2 mm} {\small Matricola: 1050878}}
 \date{}
 
 \begin{document}
-	
-  \maketitle
 
-  \section{Abstract}
-
-    La prima parte del progetto di Programmazione Concorrente e Distribuita prevede la realizzazione di un programma sequenziale in linguaggio Java per risolvere puzzle forniti tramite il passaggio da riga di comando del percorso del file di input. Inoltre, prevede il salvataggio della soluzione su un file il cui percorso è passato da riga di comando come secondo parametro.
-
-    Nella seguente relazione, allegata al progetto, verranno introdotte e discusse tutte le scelte progettuali compiute per lo sviluppo del software.
-
-  \section{Breve descrizione dell'algoritmo}
-
-    In breve, l'algoritmo pensato per risolvere questo problema è il seguente:
-
-    \begin{enumerate}
-
-      \item effettuare il \emph{parsing} dei pezzi presenti nel file di input e salvarli in una struttura dati appropriata (se ne discuterà in seguito)
-      \item trovare l'elemento del puzzle in alto a sinistra, riconoscibile perché l'ID del pezzo a nord e quello a ovest è uguale alla stringa \verb|VUOTO|
-      \item a partire da esso, trovare la prima colonna
-      \item trovare tutte le righe a partire dal primo elemento della colonna ottenuta dal punto precedente
-
-    \end{enumerate}
-
-	\section{Organizzazione delle classi}
-
-    Le classi prodotte sono le seguenti:
-
-    \begin{itemize}
-
-      \item \verb|PuzzleSolver|
-      \item \verb|unipd.cs.p3.puzzlesolver.tile.Tile|
-      \item \verb|unipd.cs.p3.puzzlesolver.tile.PSTile|
-      \item \verb|unipd.cs.p3.puzzlesolver.tile.TileParser|
-      \item \verb|unipd.cs.p3.puzzlesolver.puzzle.Puzzle|
-      \item \verb|unipd.cs.p3.puzzlesolver.puzzle.PSPuzzle|
-      \item \verb|unipd.cs.p3.puzzlesolver.puzzle.PuzzleBuilder|
-
-    \end{itemize}
-
-    Nei prossimi paragrafi verrà discusso il motivo per cui si è stata proposta questa organizzazione e verranno descritte dettagliatamente tutte le classi ora elencate.
-
-    \subsection{Package}
-
-      \begin{figure}[H]
-
-        \centering
-        \includegraphics[scale=0.5]{uml/packages.png}
-        \caption{Diagramma dei package}
-        \label{uml:packages}
-
-      \end{figure}
-
-      La figura \ref{uml:packages} mostra l'organizzazione in package del progetto. Tutte le classi, ad eccezione di PuzzleSolver, sono contenute all'interno di un package raccoglitore chiamato \verb|unipd.cs.p3.puzzlesolver|. Quest'ultimo è a sua volta diviso in due \emph{subpackage}: \verb|tile| e \verb|package|.
-
-      È stata preferita una suddivisione in questo senso piuttosto che creare un unico grande package in quanto quella adottata permette di separare e organizzare meglio la logica del programma.
-
-      \begin{description}
-
-        \item[tile] Il package \verb|tile| contiene tutto ciò che ha a che fare con i pezzi del puzzle. Descrive e contiene:
-
-        \begin{itemize}
-
-          \item l'interfaccia \verb|Tile|, contratto pubblico di un pezzo del puzzle
-          \item un'implementazione di \verb|Tile| chiamata \verb|PSTile|
-          \item la classe \verb|TileParser| che, tramite un pattern architetturale simile a \emph{Factory}, permette di ottenere una struttura dati contenente \verb|Tile| a partire da un file di testo (di discuterà di strutture dati successivamente). 
-
-        \end{itemize}
-
-        \item[puzzle] Il package \verb|Puzzle| contiene tutto ciò che ha a che fare con la risoluzione di un puzzle. Descrive e contiene:
-
-        \begin{itemize}
-
-          \item l'interfaccia \verb|Puzzle|, contratto pubblico di un puzzle \textbf{risolto}
-          \item un'implementazione di \verb|Puzzle| chiamata \verb|PSPuzzle|
-          \item la classe \verb|PuzzleBuilder| che risolve e costruisce un \verb|Puzzle| a partire da dei \verb|Tile|. Anch'essa, come \verb|TileParser| richiama all'uso di pattern architetturali come \emph{Factory}.
-
-        \end{itemize}
-
-      \end{description}
-
-    \subsection{Package Tile}
-
-      \subsubsection{Tile}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/tile.png}
-          \caption{Diagramma dell'interfaccia Tile}
-          \label{uml:tile}
-
-        \end{figure}
-
-        \verb|Tile| è un'interfaccia che rappresenta il contratto pubblico di un pezzo del puzzle, elencato in figura ~\ref{uml:tile}. Contiene metodi per ottenere informazioni sui pezzi vicini e sul suo codice identificativo.
-
-      \subsubsection{PSTile}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/pstile.png}
-          \caption{Diagramma della classe PSTile}
-          \label{uml:pstile}
-
-        \end{figure}
-
-        Come si può vedere dalla figura ~\ref{uml:pstile}, la classe PSTile è una banale implementazione dell'interfaccia \verb|Tile|. 
-
-        Da notare la ridefinizione del metodo \verb|toSymbol()| che ora restituisce una stringa come simbolo del pezzo, anziché un \verb|Object| come nella definizione dell'interfaccia. Questo è possibile in quanto \verb|String| è sottotipo di \verb|Object|.
-
-        Il motivo per cui il metodo nell'intefaccia ritorna un oggetto generico è da attribuire alla possibilità di \verb|Tile| di essere implementata da una classe indipendente dal tipo di simbolo. Si pensi ad esempio a puzzle di immagini anziché di stringhe.
-
-      \subsubsection{TileParser}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/tileparser.png}
-          \caption{Diagramma della classe TileParser}
-          \label{uml:tileparser}
-
-        \end{figure}
-
-        La classe \verb|TileParser| ha lo scopo di ottenere una struttura dati contenente \verb|Tile| a partire da un file di testo. In particolare viene restituita una \verb|HashMap| che ha come chiave l'ID del pezzo e come valore un \verb|Tile|. 
-
-        Questo perché \verb|HashMap|, che eredita dalla classe astratta \verb|Map|, è una struttura dati associativa, per cui è possibile ottenere un \verb|Tile| a partire dal suo solo codice identificativo, senza dover scorrere ogni volta una lista o un vettore. 
-
-        Ciò diventa particolarmente utile quando si vuole ottenere un sequenza di \verb|Tile| consecutivi in quanto, partendo dal primo, basta ottenere l'ID di quello nella direzione desiderata e cercarlo nell'\verb|HashMap| per ottenere il successivo, fino alla fine.
-
-        Dunque, per ottenere i \verb|Tile| si crea un oggetto della classe \verb|TileParser|, passando come parametro al costruttore il percorso del file di input. Dopodiché si chiama il metodo \verb|getTiles()| per ottenere i pezzi. 
-
-        Il suddetto metodo non fa altro che aprire il file e ottenere un \verb|Tile| da ogni riga con il metodo privato \verb|parseTile(String)|. Questo metodo ha buone possibilità di essere reso concorrente nelle successive parti del progetto.
-
-    \subsection{Package Puzzle}
-
-      \subsubsection{Puzzle}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/puzzle.png}
-          \caption{Diagramma dell'interfaccia Puzzle}
-          \label{uml:puzzle}
-
-        \end{figure}
-
-        L'interfaccia \verb|Puzzle| rappresenta il contratto pubblico di un puzzle risolto. Ha quindi i metodi per visualizzare la dimensione del puzzle e la sua forma tabellare.
-
-      \subsubsection{PSPuzzle}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/pspuzzle.png}
-          \caption{Diagramma della classe PSPuzzle}
-          \label{uml:pspuzzle}
-
-        \end{figure}
-
-        La classe \verb|PSPuzzle| è una banale implementazione dell'interfaccia \verb|Puzzle|. Da notare che il costruttore richiede come parametro una matrice \verb|Tile[][]|.
-
-        Inoltre, come per la classe \verb|PSTile|, nonostante il metodo \verb|toLine| nell'interfaccia \verb|Puzzle| chieda di restituire un \verb|Object|, l'implementazione restituisce un oggetto di tipo \verb|String|.  
-
-      \subsubsection{PuzzleBuilder}
-
-        \begin{figure}[H]
-
-          \centering
-          \includegraphics[scale=0.7]{uml/puzzlebuilder.png}
-          \caption{Diagramma della classe PuzzleBuilder}
-          \label{uml:puzzlebuilder}
-
-        \end{figure}
-
-        Il contratto pubblico di \verb|PuzzleBuilder| prevede che venga istanziata con una \verb|HashMap| e che, chiamando il metodo \verb|solvePuzzle()|, venga restituito un oggetto di tipo \verb|Puzzle| che rappresenta un puzzle risolto.
-
-        Più nel dettaglio, dal punto di vista \emph{privato} della classe, il metodo \verb|solvePuzzle()| chiama innanzitutto \verb|solveFirstColumn()| che, partendo dall'elemento in alto a sinistra, trova la prima colonna del puzzle. Successivamente, per ogni elemento della colonna restituita, si chiama il metodo \verb|solveRow()| che procederà a risolvere le righe.
-
-        In questo modo, l'unica ricerca da compiere nella struttura dati è quella del primo elemento, in alto a sinistra. Dopodiché, sfruttando le informazioni contenute in esso si procede a ricostruire la prima colonna e poi le righe.
-
-        Si è adottato questo metodo perché è molto semplice da mettere in atto e ha buone potenzialità dal punto di vista concorrente. Con pochi aggiustamenti, il lavoro di \verb|solveRow()| potrebbe essere svolto da dei \emph{thread} che non avrebbero nemmeno bisogno di coordinarsi tra loro una volta partiti, a patto di usare strutture dati che supportano accessi e modifiche concorrenti.
-
-    \subsection{Package di default}
-
-      \subsubsection{PuzzleSolver}
-
-        La classe \verb|PuzzleSolver|, contenente il metodo \verb|main|, ha innanzitutto il compito di creare un oggetto di tipo \verb|TileParser| passandogli il percorso del file di input. 
-
-        Successivamente prende i pezzi ottenuti dal metodo \verb|getTiles()| e li riversa in un oggetto della classe \verb|PuzzleBuilder| da cui otterrà il puzzle risolto.
-
-        Infine, deve solamente salvare il file di output come da specifica tramite le informazioni messe a disposizione dal contratto di \verb|Puzzle|.
-
-  \section{Gestione degli errori}
-
-    \subsection{Numero di parametri}
-
-      All'interno della classe \verb|PuzzleSolver| viene effettuato un controllo per verificare che il programma sia stato eseguito col corretto numero di parametri. In caso contrario, viene stampato un messaggio che spiega in forma standard l'utilizzo del software dopodiché quest'ultimo si chiude.
-
-    \subsection{Formato dei dati in input}
-
-      Nel metodo \verb|parseLine| della classe \verb|TileParser| viene effettivamente eseguita la conversione del pezzo da stringa a oggetto di tipo \verb|Tile|. Se il numero di pezzi in cui la linea di input può essere spezzata è diverso da quello aspettato, viene lanciata un'eccezione \verb|IrregularTileLineException|. 
-
-      Quest'ultima viene poi rilanciata dal metodo \verb|getTiles| e gestita con un messaggio d'errore all'interno del main di \verb|PuzzleSolver|.
-
-    \subsection{Risolvibilità del puzzle}
-
-      Il puzzle non è risolvibile se esistono riferimenti a pezzi non presenti in input o se i riferimenti stessi sono sbagliati.
-
-      Ci sono due \emph{punti} all'interno di \verb|PuzzleBuilder| in cui è possibile controllare questo errore:
-
-      \begin{itemize}
-
-        \item ricerca del pezzo in alto a sinistra
-        \item completamento di una riga
-
-      \end{itemize}
-
-      Se non si riesce a completare uno qualsiasi dei due punti precedenti, che potremmo chiamare \emph{checkpoint}, viene lanciata \verb|UnsolvablePuzzleException| gestita nel main di \verb|PuzzleSolver|.
-
-  \section{Test effettuati}
-
-    I test sono stati effettuati con file di input generati casualmente secondo la specifica. Ad ogni generazione, veniva salvata su file anche la soluzione, da poter confrontare con quella ottenuta da \verb|PuzzleSolver|. 
-
-    Questi file di input sono liberamente consultabili nella cartella \verb|test| del progetto. Inoltre, alla consegna viene allegato anche il generatore di puzzle, presente nella cartella \verb|tools|.
-
-  \section{Considerazioni su Java 7}
-
-    Come da specifica, il software è stato scritto per essere compatibile con Java 7+. Questa scelta ha reso possibile l'utilizzo di strumenti più aggiornati ed efficienti. Tra quelli utilizzati in questo progetto, si annoverano le nuovi classi per la lettura e scrittura di un file ed il nuovo metodo \verb|String.split| per la scomposizione di una stringa.
-
-    Il codice, al momento della stesura di questa relazione, è tranquillamente compilabile nei laboratori del Dipartimento di Matematica presso l'edificio Paolotti a patto di modificare correttamente alcune variabili d'ambiente per impostare Java 7 come JDK di default.
-
+\maketitle
+
+\section{Abstract}
+
+La seconda parte del progetto di Programmazione Concorrente e Distribuita
+prevede l'aggiornamento della prima parte sequenziale con l'introduzione della
+concorrenza nella risoluzione del Puzzle.
+Nella seguente relazione, allegata al progetto, verranno introdotte e discusse
+tutte le scelte progettuali compiute per lo sviluppo di questa seconda parte.
+
+\section{Modifiche all'algoritmo di risoluzione}
+
+L'algoritmo di risoluzione del puzzle ha subito alcune variazioni rispetto alla
+prima parte. In particolare, le prime iterazioni rimangono invariate:
+
+\begin{enumerate}
+\item effettuare il \emph{parsing} dei pezzi presenti nel file di input e
+\strong{salvarli in una struttura dati appropriata} (se ne discuterà in seguito);
+\item \strong{trovare l'elemento del puzzle in alto a sinistra}, riconoscibile
+perché l'ID del pezzo a nord e quello a ovest è uguale alla stringa
+\verb|VUOTO|;
+\item a partire da esso, \strong{trovare la prima colonna}.
+\end{enumerate}
+
+A questo punto, rispetto all'algoritmo sequenziale, esso esegue le seguenti
+operazioni:
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item a partire dal primo elemento della colonna calcolata al punto precedente,
+\strong{calcola la prima riga};
+\item esegue una valutazione per \strong{capire la forma del puzzle} (quadrata,
+rettangolare con numero di righe maggiore del numero di colonne e viceversa);
+\item in base alla valutazione del punto precedente, \strong{decide se è più conveniente} procedere parallelizzando la risoluzione delle righe o delle
+colonne;
+\item ricompone la soluzione e la restituisce.
+\end{enumerate}
+
+\section{Modifiche alla gerarchia delle classi}
+
+\subsection{Concorrenza aggiunta alla classe PuzzleBuilder}
+
+La progettazione concorrente della classe PuzzleBuilder si basa sull'uso di un
+\emph{Thread Pool}, ossia gestore automatizzato dei thread o, più in generale,
+di alcuni \emph{task} che si vogliono eseguire in parallelo.
+
+In base a questo sistema, PuzzleBuilder contiene ora due classi interne,
+\strong{RowSolverTask} per la risoluzione del puzzle per righe e l'analoga
+\strong{ColumnSolverTask} per le colonne. Entrambe implementano l'interfaccia
+\verb|Callable<Tile[]>| e il metodo \verb|call()|.
+
+Il nuovo metodo \verb|solvePuzzle()|, una volta deciso quale dei due metodi è
+più conveniente adottare per il puzzle ricevuto in input, crea un thread pool
+tramite l'oggetto \verb|ExecutionService| e gli assegna tanti \emph{task} quante
+sono le righe o le colonne da risolvere.
+
+Dopo aver invocato il pool, il metodo si prepara a raccogliere i risultati, che
+saranno accessibili tramite l'interfaccia \verb|Future<Tile[]>|. Questo è
+possibile in quanto il metodo \verb|call()| di RowSolverTask e ColumnSolverTask
+è in grado di ritornare un oggetto di tipo \verb|Tile[]|, che corrisponde alla
+riga o alla colonna risolta. Il thread pool non fa altro che raccogliere questi
+risultati man mano che vengono prodotti dai thread in esecuzione e renderli
+accessibili tramite \verb|Future|.
+
+In questo modo, i risultati ritornano automaticamente nello stesso ordine con
+cui erano stati lanciati e, nel caso un thread stia ancora lavorando a un task
+necessario, il flusso di controllo di \verb|solvePuzzle()| viene automaticamente
+sospeso fino alla disponibilità dei dati.
+
+Così facendo non è necessario aspettare che tutte le righe o le colonne vengano
+risolte, ma solo che diventino disponibili quelle immediatamente necessarie per
+iniziare a costruire il puzzle, aumentando l'efficienza. Una volta ricostruito
+completamente, viene restituito tramite un oggetto che implementa l'interfaccia
+\verb|Puzzle|.
+
+Un altro vantaggio dell'uso di un thread pool riguarda le prestazioni in quanto
+si riducono gli \emph{overhead} dovuti alla creazione e alla gestione di thread
+singoli.
+
+La dimensione del pool, come suggerito da \cite{goetz2006java}, è proporzionale
+al numero di \emph{core} della macchina in cui viene eseguito il programma. In
+particolare, una \emph{best practice} proveniente da un'ulteriore ricerca in
+Rete suggerisce, per ottimizzare la concorrenza, di impostare la grandezza del
+thread pool nel seguente modo.
+
+\[ \text{grandezza thread pool} = \text{numero core} + 1 \]
+
+Da prove eseguite personalmente, le prestazioni effettivamente aumentano per via
+di una maggiore efficienza dello scambio di task all'interno del pool.
+
+Si parlerà successivamente della sicurezza nella concorrenza di questa soluzione
+in quanto abbiamo prima bisogno d'introdurre la struttura dati utilizzata.
+
+\subsection{Cambio di struttura dati}
+\label{struttura-dati}
+
+In questa parte del progetto, la precedente \verb|HashMap| è stata sostituita da
+una \verb|ConcurrentHashMap|. Così facendo, la struttura dati diventa
+perfettamente \emph{thread-safe} ed impedisce eventuali inconsistenze quando
+l'algoritmo rimuove pezzi appena trovati.
+
+Tuttavia, \verb|ConcurrentHashMap| necessita di qualche ottimizzazione.
+Infatti, per default, essa organizza la sua struttura interna per un livello
+molto alto di concorrenza, troppo per le caratteristiche di questa soluzione del
+progetto. Per cui, è necessario abbassare quest'impostazione di concorrenza per
+poter godere di un'ottima sicurezza senza rinunciare alle prestazioni.
+
+C'erano altre soluzioni possibili, come modificare l'algoritmo perché non
+cancellasse i pezzi trovati, in modo da poter usare una semplice \verb|HashMap|
+in sola lettura, oppure ricorrere a \emph{lock} tramite blocchi
+\verb|synchronized| ma sono state scartate perché giudicate poco utili al fine
+di incrementare la concorrenza del software. Non si escludono tuttavia modifiche
+nella terza parte.
+
+\subsection{Gestione delle eccezioni}
+Anche nell'ambiente concorrente della classe \verb|PuzzleBuilder| rimangono le
+eccezioni introdotte nella parte precedente e vengono introdotte quelle tipiche
+della concorrenza, come \verb|InterruptedException|. Per analizzarle al meglio,
+è bene distinguere tra eccezioni dovute a un errore nella ricerca di una
+soluzione del puzzle e eccezioni relative ad altri errori.
+
+\subsubsection{Errori nella risoluzione di un puzzle}
+All'interno di \verb|PuzzleBuilder| l'eccezione che segnala un errore nella
+risoluzione di un puzzle può essere lanciata entro tre contesti:
+\begin{itemize}
+\item la ricerca dell'elemento in alto a sinistra del puzzle;
+\item la risoluzione di una riga;
+\item la risoluzione di una colonna.
+\end{itemize}
+
+In tutti e tre i casi, se l'eccezione viene lanciata, allora è valida una delle
+seguenti condizioni.
+
+\begin{itemize}
+\item nel caso di ricerca dell'elemento \emph{top-left}, significa che non è
+stato trovato, rendendo il puzzle non valido;
+\item nel caso di risoluzione di riga o di colonna, significa che non è stato
+trovato il pezzo del puzzle successivo alla sequenza fino a quel momento
+costruita e che quindi non è possibile completarla e il puzzle non è valido.
+\end{itemize}
+
+Questi sono le uniche situazioni in cui l'algoritmo non può completare il puzzle
+e l'eccezione \verb|UnsolvablePuzzleException| viene lanciata.
+
+L'errore descritto nell'ultima situazione può verificarsi anche all'interno di
+un thread. Tuttavia, ciò non costituisce un problema perché l'eccezione verrà
+propagata dal metodo \verb|call()| dell'interfaccia \verb|Callable| e verrà
+intercettato dal metodo \verb|solvePuzzle()| sotto forma di
+\verb|ExecutionException|.
+
+A questo punto, l'eccezione viene verificata: se risulta il segnale di puzzle
+non valido, viene spedita fuori dal metodo per avvisare chi lo ha invocato.
+Altrimenti, viene stampato un generico messaggio di errore e il programma viene
+terminato.
+
+\subsubsection{Altri errori}
+
+Nel caso di altri errori nell'esecuzione di un thread, verrà lanciata
+un'estensione del tipo \verb|InterruptedException|. In questo caso viene
+stampato un messaggio d'errore e il programma viene terminato.
+
+\subsection{Modifiche minori}
+Oltre alle modifiche già riportate, si segnala:
+\begin{itemize}
+\item riscrittura del metodo \verb|equals()| della classe \verb|PSTile|
+secondo i consigli e le indicazioni riportati da \cite{bloch2008effective};
+\item irrobustimento e ottimizzazione generale del codice tramite analisi
+statica eseguita dal software FindBugs (http://findbugs.sourceforge.net).
+\end{itemize}
+
+\section{Sicurezza del codice concorrente}
+Essendo la nuova struttura dati citata nella sezione \ref{struttura-dati} perfettamente \emph{thread-safe}, non è necessario sincronizzare gli accessi ad
+essa. Per cui, non ci saranno né attese attive né \emph{deadlock}.
+
+Per dimostrare l'assenza di interferenze, è bene distinguere il caso di puzzle
+valido e puzzlenon valido.
+
+\subsection{Interferenze in caso di puzzle valido}
+Non possono esserci interferenze in caso di puzzle valido in quanto ogni thread
+ricostruirà una riga o una colonna senza produrre effetti collaterale per gli
+altri, in quanto non si \emph{incroceranno} mai.
+
+\subsection{Interferenze in caso di puzzle non valido}
+Un puzzle non valido prevede almeno una qualsiasi coordinata sbagliata in un
+pezzo. Nel caso banale che essa sia un riferimento a un pezzo inesistente, la
+chiamata \verb|get()| alla struttura dati ritornerà un riferimento vuoto,
+segnale per far scattare l'eccezione di puzzle non valido.
+
+Nel caso invece che la coordinata sbagliata sia un riferimento a un pezzo $p$
+che non sta nella stessa riga o colonna (a seconda del metodo di risoluzione),
+allora esisterà un altro thread con il quale ci saranno interferenze da $p$ fino
+alla fine della riga (o della colonna).
+
+Anche sapendo che \verb|ConcurrentHashMap| non pone \emph{lock} in lettura, a
+livello probabilistico è piuttosto debole la possibilità che due thread che si
+trovino in questa situazione possano proseguire insieme fino alla fine. Tuttavia
+per ottenere la certezza assoluta è stato aggiunto un controllo sulla rimozione.
+
+\section{Test effettuati}
+
+Rispetto alla parte precedente, è stato notevolmente migliorato il generatore di
+puzzle. Inoltre, sono stati creati alcuni \strong{test di unità} per eseguire
+verifiche su alcuni componenti critiche del software.
+
+Grazie al generatore di puzzle, sono stati svolti anche test prestazionali, o
+\emph{benchmark}, per ottenere alcune misurazioni utili a verificare quali
+soluzioni concorrenti potessero portare più benefici. A questo proposito è stato
+creato un piccolo programma Java che automatizzasse questa procedura (
+\verb|PuzzleBenchmark|).
+
+\bibliographystyle{plainnat}
+\bibliography{bibliography}
 \end{document}

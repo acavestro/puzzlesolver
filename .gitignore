@@ -4,6 +4,7 @@ build/
 *.class
 report/*
 !report/*.tex
+!report/*.bib
 !report/uml
 *.pdf
 /bin/
