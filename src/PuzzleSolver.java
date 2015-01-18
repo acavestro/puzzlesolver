@@ -33,8 +33,9 @@ public class PuzzleSolver {
     } catch (final IrregularTileLineException itle) {
 
       System.out
-          .println("ERROR: Some tiles are in a irregular format. "
-              + "Check input file.\nAborting..");
+      .println("ERROR: Some tiles are in a irregular format. "
+          + "Check input file.\nAborting..");
+      System.out.println(itle.getMessage());
       return;
 
     }

@@ -48,7 +48,8 @@ public class TileParser {
     String[] rawTile = line.split(DELIM);
 
     if (rawTile.length != 6) {
-      throw new IrregularTileLineException();
+      throw new IrregularTileLineException(
+          "Missing informations about a tile");
     }
     String id = rawTile[0];
     return new PSTile(id, rawTile[1], rawTile[2], rawTile[3],
