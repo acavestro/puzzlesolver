@@ -187,11 +187,17 @@ public class PuzzleBuilder {
 
     } catch (InterruptedException e) {
       System.out
-          .println("Interrupted exception happened in the thread pool");
+      .println("Interrupted exception happened in the thread pool");
       e.printStackTrace();
+      System.exit(1);
     } catch (ExecutionException e) {
       if (e.getCause() instanceof UnsolvablePuzzleException) {
         throw new UnsolvablePuzzleException(e.getMessage());
+      } else {
+        System.out.println("Unrecognized exception happened!");
+        System.out.println(e.getCause().getMessage());
+        e.getCause().printStackTrace();
+        System.exit(1);
       }
     }
 
