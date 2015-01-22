@@ -1,6 +1,8 @@
 package unipd.cs.p3.puzzlesolver.tile;
 
-public interface Tile {
+import java.io.Serializable;
+
+public interface Tile extends Serializable {
 
   public String getUp();
   public String getDown();

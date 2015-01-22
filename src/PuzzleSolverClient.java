@@ -1,26 +1,27 @@
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import unipd.cs.p3.puzzlesolver.netutils.PuzzleBuilderFactory;
+import unipd.cs.p3.puzzlesolver.netutils.Solver;
 import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
-import unipd.cs.p3.puzzlesolver.puzzle.PuzzleBuilder;
-import unipd.cs.p3.puzzlesolver.puzzle.UnsolvablePuzzleException;
 import unipd.cs.p3.puzzlesolver.tile.IrregularTileLineException;
 import unipd.cs.p3.puzzlesolver.tile.Tile;
 import unipd.cs.p3.puzzlesolver.tile.TileParser;
 
 public class PuzzleSolverClient {
-  public static void main(String args[]) throws NamingException {
+  public static void main(String args[]) throws NamingException,
+      RemoteException, MalformedURLException, NotBoundException {
     if (args.length != 2) {
       System.out.println("Usage: PuzzleSolver INPUT_FILE OUTPUT_FILE");
       return;
@@ -43,28 +44,26 @@ public class PuzzleSolverClient {
 
     }
 
-    final Context namingContext = new InitialContext();
     // TODO l'IP va passato come parametro
-    final String url = "rmi://localhost/puzzlebuilderfactory";
-    final PuzzleBuilderFactory psFactory = (PuzzleBuilderFactory) namingContext
-        .lookup(url);
+    final String url = "rmi://localhost/remotesolver";
+    final Solver remoteSolver = (Solver) Naming.lookup(url);
 
-    final PuzzleBuilder pb = psFactory.getBuilder(m);
+    // TODO questa istruzione c'ha un remote exception da gestire
+    final Puzzle out = remoteSolver.solvePuzzle(m);
 
-    Puzzle out;
-
-    try {
-
-      out = pb.solvePuzzle();
-
-    } catch (final UnsolvablePuzzleException upe) {
-
-      System.out.println("ERROR: Missing tiles or wrong coordinates. "
-          + "Unsolvable puzzle. Check input file.\nAborting... ");
-      System.out.println(upe.getMessage());
-      return;
-
-    }
+    /*
+     * TODO Questa eccezione è da gestire try {
+     *
+     * out = pb.solvePuzzle();
+     *
+     * } catch (final UnsolvablePuzzleException upe) {
+     *
+     * System.out.println("ERROR: Missing tiles or wrong coordinates. " +
+     * "Unsolvable puzzle. Check input file.\nAborting... ");
+     * System.out.println(upe.getMessage()); return;
+     *
+     * }
+     */
 
     final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()
         + "\n" + out.getRows() + " " + out.getCols();

@@ -1,6 +1,8 @@
 package unipd.cs.p3.puzzlesolver.puzzle;
 
-public interface Puzzle {
+import java.io.Serializable;
+
+public interface Puzzle extends Serializable {
 
   public int getRows();
 
