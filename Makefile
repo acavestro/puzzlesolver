@@ -1,29 +1,9 @@
 SRC = ./src
 BUILD = ./build
-JFLAGS = -g -d $(BUILD)
 JC = javac
-
-CLASSES = Tile \
-		  PSTile \
-		  IrregularTileLineException \
-		  TileParser \
-		  Puzzle \
-		  PSPuzzle \
-		  UnsolvablePuzzleException \
-		  PuzzleBuilder \
-		  PuzzleSolver
-
-SOURCES := $(addprefix $(BUILD)/, $(CLASSES))
-SOURCES := $(addsuffix .java, $(SOURCES))
 
 default: puzzlesolver
 
-puzzlesolver_old: clean
-	mkdir $(BUILD)
-	find $(SRC) -type f -name "*.java" -exec cp {} $(BUILD) \;
-	$(JC) $(JFLAGS) $(SOURCES)
-	find $(BUILD) -type f -name "*.java" -exec rm -rf {} \;
-	cd $(BUILD); jar cfe ../PuzzleSolver.jar PuzzleSolver ./*
 
 prepare_build:
 	mkdir $(BUILD)
@@ -42,7 +22,6 @@ puzzlesolver: clean prepare_build puzzleclient puzzleserver clean_build
 
 clean:
 	rm -rf $(BUILD)
-	rm -rf PuzzleSolver.jar
 
 generator: cleangen
 	cd tools; javac PuzzleGenerator.java
