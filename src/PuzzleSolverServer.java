@@ -11,10 +11,16 @@ public class PuzzleSolverServer {
   public static void main(String args[]) throws NamingException,
   RemoteException, MalformedURLException {
 
+    if (args.length != 1) {
+      System.out.println("Usage: ./puzzlesolverserver.sh SERVER_NAME");
+      return;
+    }
+
+    final String serverName = args[0] + ":1099";
+
     // TODO questo coso deve gestire RemoteException e MalformedURL
     // Capire se posso lasciarla in throws o gestirla.
     final Solver ns = new RemoteSolver();
-    // TODO sto coso dovrà accettare come parametro il suo fottuto host
-    Naming.rebind("rmi://localhost/remotesolver", ns);
+    Naming.rebind("rmi://" + serverName + "/remotesolver", ns);
   }
 }

@@ -21,9 +21,10 @@ import unipd.cs.p3.puzzlesolver.tile.TileParser;
 
 public class PuzzleSolverClient {
   public static void main(String args[]) throws NamingException,
-      RemoteException, MalformedURLException, NotBoundException {
-    if (args.length != 2) {
-      System.out.println("Usage: PuzzleSolver INPUT_FILE OUTPUT_FILE");
+  RemoteException, MalformedURLException, NotBoundException {
+    if (args.length != 3) {
+      System.out.println("Usage: ./puzzlesolverclient.sh "
+          + "INPUT_FILE OUTPUT_FILE SERVER_NAME");
       return;
     }
 
@@ -44,8 +45,8 @@ public class PuzzleSolverClient {
 
     }
 
-    // TODO l'IP va passato come parametro
-    final String url = "rmi://localhost/remotesolver";
+    final String serverName = args[2] + ":1099";
+    final String url = "rmi://" + serverName + "/remotesolver";
     final Solver remoteSolver = (Solver) Naming.lookup(url);
 
     // TODO questa istruzione c'ha un remote exception da gestire
