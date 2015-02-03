@@ -1,4 +1,5 @@
 import java.net.MalformedURLException;
+import java.rmi.AccessException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
@@ -21,6 +22,22 @@ public class PuzzleSolverServer {
     // TODO questo coso deve gestire RemoteException e MalformedURL
     // Capire se posso lasciarla in throws o gestirla.
     final Solver ns = new RemoteSolver();
-    Naming.rebind("rmi://" + serverName + "/remotesolver", ns);
+    try {
+      Naming.rebind("rmi://" + serverName + "/remotesolver", ns);
+    } catch (final AccessException ae) {
+      System.out
+      .println("Critical error: server can't contact rmi server due"
+          + " to a permission error. \n Exiting..");
+      System.exit(-1);
+    } catch (final RemoteException re) {
+      System.out
+          .println("Error: rmi registry could not be contacted..");
+      // TODO implementare meccanismo di retry.
+    } catch (final MalformedURLException mue) {
+      System.out
+      .println("Critical error: server is using a malformed url to"
+          + " contact rmi registry. \n Exiting..");
+      System.exit(-1);
+    }
   }
 }

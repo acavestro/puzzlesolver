@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.AccessException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -47,24 +48,42 @@ public class PuzzleSolverClient {
 
     final String serverName = args[2] + ":1099";
     final String url = "rmi://" + serverName + "/remotesolver";
-    final Solver remoteSolver = (Solver) Naming.lookup(url);
+    Solver remoteSolver = null;
 
-    // TODO questa istruzione c'ha un remote exception da gestire
-    final Puzzle out = remoteSolver.solvePuzzle(m);
+    try {
+      remoteSolver = (Solver) Naming.lookup(url);
+    } catch (final NotBoundException nbe) {
+      System.out
+      .println("Critical error: remotesolver object is not bound on the"
+          + " rmi server. \n Exiting..");
+      System.exit(-1);
+    } catch (final AccessException ae) {
+      System.out
+      .println("Critical error: client can't contact rmi server due"
+          + " to a permission error. \n Exiting..");
+      System.exit(-1);
+    } catch (final RemoteException re) {
+      System.out
+      .println("Error: rmi registry could not be contacted..");
+      // TODO implementare meccanismo di retry.
+    } catch (final MalformedURLException mue) {
+      System.out
+      .println("Critical error: client is using a malformed url to"
+          + " contact rmi registry. \n Exiting..");
+      System.exit(-1);
+    }
 
-    /*
-     * TODO Questa eccezione è da gestire try {
-     *
-     * out = pb.solvePuzzle();
-     *
-     * } catch (final UnsolvablePuzzleException upe) {
-     *
-     * System.out.println("ERROR: Missing tiles or wrong coordinates. " +
-     * "Unsolvable puzzle. Check input file.\nAborting... ");
-     * System.out.println(upe.getMessage()); return;
-     *
-     * }
-     */
+    Puzzle out = null;
+    try {
+      out = remoteSolver.solvePuzzle(m);
+    } catch (final RemoteException re) {
+      System.out
+      .println("Error: connection to the server has ben lost while"
+          + " it was solving the puzzle..");
+      // TODO implementare meccanismo di retry
+    }
+
+    // TODO gestire eccezioni di puzzle non valido
 
     final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()
         + "\n" + out.getRows() + " " + out.getCols();
