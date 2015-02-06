@@ -8,12 +8,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.AccessException;
 import java.rmi.Naming;
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.naming.NamingException;
-
+import unipd.cs.p3.puzzlesolver.netutils.PuzzleExceptionBuffer;
+import unipd.cs.p3.puzzlesolver.netutils.RemoteExceptionBuffer;
 import unipd.cs.p3.puzzlesolver.netutils.Solver;
 import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.tile.IrregularTileLineException;
@@ -21,8 +23,7 @@ import unipd.cs.p3.puzzlesolver.tile.Tile;
 import unipd.cs.p3.puzzlesolver.tile.TileParser;
 
 public class PuzzleSolverClient {
-  public static void main(String args[]) throws NamingException,
-  RemoteException, MalformedURLException, NotBoundException {
+  public static void main(String args[]) {
     if (args.length != 3) {
       System.out.println("Usage: ./puzzlesolverclient.sh "
           + "INPUT_FILE OUTPUT_FILE SERVER_NAME");
@@ -49,7 +50,6 @@ public class PuzzleSolverClient {
     final String serverName = args[2] + ":1099";
     final String url = "rmi://" + serverName + "/remotesolver";
     Solver remoteSolver = null;
-
     try {
       remoteSolver = (Solver) Naming.lookup(url);
     } catch (final NotBoundException nbe) {
@@ -73,9 +73,19 @@ public class PuzzleSolverClient {
       System.exit(-1);
     }
 
+    PuzzleExceptionBuffer exceptionBuffer = null;
+    int clientId = -1;
+    try {
+      exceptionBuffer = new RemoteExceptionBuffer();
+      clientId = remoteSolver.attachExceptionBuffer(exceptionBuffer);
+    } catch (final RemoteException re) {
+      // TODO gestire questa eccezione
+      re.printStackTrace();
+    }
+
     Puzzle out = null;
     try {
-      out = remoteSolver.solvePuzzle(m);
+      out = remoteSolver.solvePuzzle(m, clientId);
     } catch (final RemoteException re) {
       System.out
       .println("Error: connection to the server has ben lost while"
@@ -83,7 +93,24 @@ public class PuzzleSolverClient {
       // TODO implementare meccanismo di retry
     }
 
-    // TODO gestire eccezioni di puzzle non valido
+    if (out == null) {
+      try {
+        System.out.println("Critical error: "
+            + exceptionBuffer.getMessage());
+      } catch (final RemoteException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      System.out.println("Exiting..");
+      System.exit(-1);
+    }
+
+    try {
+      UnicastRemoteObject.unexportObject(exceptionBuffer, true);
+    } catch (final NoSuchObjectException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
 
     final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()
         + "\n" + out.getRows() + " " + out.getCols();
@@ -101,5 +128,6 @@ public class PuzzleSolverClient {
       System.err.println(e);
 
     }
+
   }
 }
