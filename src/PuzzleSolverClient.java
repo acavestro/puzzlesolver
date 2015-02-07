@@ -46,8 +46,8 @@ public class PuzzleSolverClient {
 
     }
 
-    final String serverName = args[2] + ":1099";
-    final String url = "rmi://" + serverName + "/remotesolver";
+    final String serverName = args[2];
+    final String url = "rmi://localhost/" + serverName;
     Solver remoteSolver = null;
     try {
       remoteSolver = (Solver) Naming.lookup(url);

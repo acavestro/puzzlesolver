@@ -14,11 +14,11 @@ public class PuzzleSolverServer {
       return;
     }
 
-    final String serverName = args[0] + ":1099";
+    final String serverName = args[0];
 
     try {
       final Solver ns = new RemoteSolver();
-      Naming.rebind("rmi://" + serverName + "/remotesolver", ns);
+      Naming.rebind("rmi://localhost/" + serverName, ns);
     } catch (final AccessException ae) {
       System.out
       .println("Critical error: server can't contact rmi server due"
