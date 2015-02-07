@@ -14,8 +14,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 
-import unipd.cs.p3.puzzlesolver.netutils.PuzzleExceptionBuffer;
-import unipd.cs.p3.puzzlesolver.netutils.RemoteExceptionBuffer;
+import unipd.cs.p3.puzzlesolver.netutils.PuzzleErrorMessageBuffer;
+import unipd.cs.p3.puzzlesolver.netutils.RemoteErrorMessageBuffer;
 import unipd.cs.p3.puzzlesolver.netutils.Solver;
 import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.tile.IrregularTileLineException;
@@ -73,11 +73,11 @@ public class PuzzleSolverClient {
       System.exit(-1);
     }
 
-    PuzzleExceptionBuffer exceptionBuffer = null;
+    PuzzleErrorMessageBuffer exceptionBuffer = null;
     int clientId = -1;
     try {
-      exceptionBuffer = new RemoteExceptionBuffer();
-      clientId = remoteSolver.attachExceptionBuffer(exceptionBuffer);
+      exceptionBuffer = new RemoteErrorMessageBuffer();
+      clientId = remoteSolver.attachErrorMessageBuffer(exceptionBuffer);
     } catch (final RemoteException re) {
       // TODO gestire questa eccezione
       re.printStackTrace();

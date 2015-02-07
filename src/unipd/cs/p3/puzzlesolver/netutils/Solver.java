@@ -12,6 +12,6 @@ public interface Solver extends Remote {
   public Puzzle solvePuzzle(ConcurrentHashMap<String, Tile> tiles,
       int clientId) throws RemoteException;
 
-  public int attachExceptionBuffer(PuzzleExceptionBuffer pexb)
+  public int attachErrorMessageBuffer(PuzzleErrorMessageBuffer pexb)
       throws RemoteException;
 }

@@ -13,10 +13,10 @@ import unipd.cs.p3.puzzlesolver.tile.Tile;
 // TODO Questa classe andrebbe singleton, ma non trovo modi carini per farlo
 public class RemoteSolver extends UnicastRemoteObject implements Solver {
 
-  private final ArrayList<PuzzleExceptionBuffer> exceptionBuffers;
+  private final ArrayList<PuzzleErrorMessageBuffer> errorMessageBuffers;
 
   public RemoteSolver() throws RemoteException {
-    exceptionBuffers = new ArrayList<PuzzleExceptionBuffer>();
+    errorMessageBuffers = new ArrayList<PuzzleErrorMessageBuffer>();
   }
 
   @Override
@@ -27,13 +27,13 @@ public class RemoteSolver extends UnicastRemoteObject implements Solver {
     try {
       final Puzzle p = pb.solvePuzzle();
 
-      synchronized (exceptionBuffers) {
-        exceptionBuffers.remove(clientId);
+      synchronized (errorMessageBuffers) {
+        errorMessageBuffers.remove(clientId);
       }
       return p;
     } catch (final UnsolvablePuzzleException e) {
-      synchronized (exceptionBuffers) {
-        exceptionBuffers.get(clientId).pushException(e);
+      synchronized (errorMessageBuffers) {
+        errorMessageBuffers.get(clientId).setMessage(e.getMessage());
       }
       return null;
     }
@@ -41,12 +41,12 @@ public class RemoteSolver extends UnicastRemoteObject implements Solver {
   }
 
   @Override
-  public int attachExceptionBuffer(PuzzleExceptionBuffer pexb)
+  public int attachErrorMessageBuffer(PuzzleErrorMessageBuffer pexb)
       throws RemoteException {
     int clientId = -1;
-    synchronized (exceptionBuffers) {
-      exceptionBuffers.add(pexb);
-      clientId = exceptionBuffers.indexOf(pexb);
+    synchronized (errorMessageBuffers) {
+      errorMessageBuffers.add(pexb);
+      clientId = errorMessageBuffers.indexOf(pexb);
     }
     return clientId;
   }
