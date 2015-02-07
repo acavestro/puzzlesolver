@@ -38,9 +38,9 @@ public class PuzzleSolverClient {
 
     } catch (final IrregularTileLineException itle) {
 
-      System.out
-      .println("ERROR: Some tiles are in a irregular format. "
-          + "Check input file.\nAborting..");
+      System.out.println("Critical parser error: " + itle.getMessage());
+      System.out.println("(check input file)");
+      System.out.println("Aborting..");
       System.out.println(itle.getMessage());
       return;
 
@@ -54,12 +54,14 @@ public class PuzzleSolverClient {
     } catch (final NotBoundException nbe) {
       System.out
       .println("Critical error: remotesolver object is not bound on the"
-          + " rmi server. \n Exiting..");
+              + " rmi server.");
+      System.out.println("Aborting..");
       System.exit(-1);
     } catch (final AccessException ae) {
       System.out
       .println("Critical error: client can't contact rmi server due"
-          + " to a permission error. \n Exiting..");
+              + " to a permission error.");
+      System.out.println("Aborting..");
       System.exit(-1);
     } catch (final RemoteException re) {
       System.out
@@ -68,7 +70,8 @@ public class PuzzleSolverClient {
     } catch (final MalformedURLException mue) {
       System.out
       .println("Critical error: client is using a malformed url to"
-          + " contact rmi registry. \n Exiting..");
+              + " contact rmi registry.");
+      System.out.println("Aborting..");
       System.exit(-1);
     }
 
@@ -96,7 +99,7 @@ public class PuzzleSolverClient {
     if (out.getStatus() == SolutionStatus.ERROR) {
       System.out.println("Critical puzzle error: "
           + out.getError().getMessage());
-      System.out.println("Exiting..");
+      System.out.println("Aborting..");
       System.exit(-1);
     }
 
