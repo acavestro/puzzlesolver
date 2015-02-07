@@ -9,15 +9,13 @@ import java.nio.file.Paths;
 import java.rmi.AccessException;
 import java.rmi.ConnectException;
 import java.rmi.Naming;
-import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 
-import unipd.cs.p3.puzzlesolver.netutils.PuzzleErrorMessageBuffer;
-import unipd.cs.p3.puzzlesolver.netutils.RemoteErrorMessageBuffer;
+import unipd.cs.p3.puzzlesolver.netutils.SolutionStatus;
 import unipd.cs.p3.puzzlesolver.netutils.Solver;
+import unipd.cs.p3.puzzlesolver.netutils.SolverResponse;
 import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.tile.IrregularTileLineException;
 import unipd.cs.p3.puzzlesolver.tile.Tile;
@@ -74,19 +72,9 @@ public class PuzzleSolverClient {
       System.exit(-1);
     }
 
-    PuzzleErrorMessageBuffer exceptionBuffer = null;
-    int clientId = -1;
+    SolverResponse out = null;
     try {
-      exceptionBuffer = new RemoteErrorMessageBuffer();
-      clientId = remoteSolver.attachErrorMessageBuffer(exceptionBuffer);
-    } catch (final RemoteException re) {
-      // TODO gestire questa eccezione
-      // re.printStackTrace();
-    }
-
-    Puzzle out = null;
-    try {
-      out = remoteSolver.solvePuzzle(m, clientId);
+      out = remoteSolver.solvePuzzle(m);
     } catch (final ConnectException ce) {
       // TODO exit or retry?
       System.out
@@ -99,25 +87,23 @@ public class PuzzleSolverClient {
       // TODO implementare meccanismo di retry
     }
 
-    if (out == null) {
-      try {
-        System.out.println("Critical error: "
-            + exceptionBuffer.getMessage());
-      } catch (final RemoteException e) {
-        // Local object, I suppose I can ignore this catch
-      }
+    /*
+     * Variable out can't be null, never. Server always return a SolverResponse
+     * object, with a Puzzle or with an Exception. Only if the server crashes,
+     * out can be null, but in this case the above exceptions would stop the
+     * control flow. So, at this point of the code, out is never null.
+     */
+    if (out.getStatus() == SolutionStatus.ERROR) {
+      System.out.println("Critical puzzle error: "
+          + out.getError().getMessage());
       System.out.println("Exiting..");
       System.exit(-1);
     }
 
-    try {
-      UnicastRemoteObject.unexportObject(exceptionBuffer, true);
-    } catch (final NoSuchObjectException e1) {
-      // If there's no such object to unexport, all the better.
-    }
+    final Puzzle p = out.getSolution();
 
-    final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()
-        + "\n" + out.getRows() + " " + out.getCols();
+    final String solution = p.toLine() + "\n" + "\n" + p.toMatrix()
+        + "\n" + p.getRows() + " " + p.getCols();
 
     final Path outputFile = Paths.get(args[1]);
     final Charset charset = StandardCharsets.UTF_8;
