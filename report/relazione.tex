@@ -9,7 +9,7 @@
 \newcommand{\strong}[1]{ \textbf{#1}}
 
 \title{Programmazione Concorrente e Distribuita \\ A.A. 2014/2015 \\
-\vspace{2 mm}{\small PuzzleSolver - Parte 2}}
+\vspace{2 mm}{\small PuzzleSolver - Parte 3}}
 \author{Antonio Cavestro \\ \vspace{2 mm} {\small Matricola: 1050878}}
 \date{}
 
@@ -19,211 +19,33 @@
 
 \section{Abstract}
 
-La seconda parte del progetto di Programmazione Concorrente e Distribuita
-prevede l'aggiornamento della prima parte sequenziale con l'introduzione della
-concorrenza nella risoluzione del Puzzle.
+La terza parte del progetto di Programmazione Concorrente e Distribuita
+prevede la divisione del risultato della seconda parte - concorrenza - in due
+programmi: il \emph{client}, che deve leggere il file di input e spedire i pezzi
+del puzzle al secondo programma, il \emph{server}, che invece deve risolvere
+il problema e rispedire al client la soluzione.
+
 Nella seguente relazione, allegata al progetto, verranno introdotte e discusse
-tutte le scelte progettuali compiute per lo sviluppo di questa seconda parte.
+tutte le scelte progettuali compiute per lo sviluppo di questa terza parte.
 
-\section{Modifiche all'algoritmo di risoluzione}
+%\section{Introduzione all'algoritmo distribuito}
+%\subsection{Parsing del file di input}
+%\subsection{Risoluzione del puzzle}
+%\subsection{Output}
 
-L'algoritmo di risoluzione del puzzle ha subito alcune variazioni rispetto alla
-prima parte. In particolare, le prime iterazioni rimangono invariate:
+%\section{Cambiamenti a codice e gerarchia}
 
-\begin{enumerate}
-\item effettuare il \emph{parsing} dei pezzi presenti nel file di input e
-\strong{salvarli in una struttura dati appropriata} (se ne discuterà in seguito);
-\item \strong{trovare l'elemento del puzzle in alto a sinistra}, riconoscibile
-perché l'ID del pezzo a nord e quello a ovest è uguale alla stringa
-\verb|VUOTO|;
-\item a partire da esso, \strong{trovare la prima colonna}.
-\end{enumerate}
+%\section{Comunicazione client-server}
+%\subsection{Oggetti nel registro RMI}
+%\subsection{Richiesta di risoluzione}
+%\subsection{Risposta}
+%\subsection{Eventuali errori di risoluzione}
 
-A questo punto, rispetto all'algoritmo sequenziale, esso esegue le seguenti
-operazioni:
-\begin{enumerate}
-\setcounter{enumi}{3}
-\item a partire dal primo elemento della colonna calcolata al punto precedente,
-\strong{calcola la prima riga};
-\item esegue una valutazione per \strong{capire la forma del puzzle} (quadrata,
-rettangolare con numero di righe maggiore del numero di colonne e viceversa);
-\item in base alla valutazione del punto precedente, \strong{decide se è più conveniente} procedere parallelizzando la risoluzione delle righe o delle
-colonne;
-\item ricompone la soluzione e la restituisce.
-\end{enumerate}
+%\section{Robustezza del software}
+%\subsection{Client}
+%\subsection{Server}
+%\subsection{Registro RMI}
 
-\section{Modifiche alla gerarchia delle classi}
+%\section{Altre modifiche}
 
-\subsection{Concorrenza aggiunta alla classe PuzzleBuilder}
-
-La progettazione concorrente della classe PuzzleBuilder si basa sull'uso di un
-\emph{Thread Pool}, ossia gestore automatizzato dei thread o, più in generale,
-di alcuni \emph{task} che si vogliono eseguire in parallelo.
-
-In base a questo sistema, PuzzleBuilder contiene ora due classi interne,
-\strong{RowSolverTask} per la risoluzione del puzzle per righe e l'analoga
-\strong{ColumnSolverTask} per le colonne. Entrambe implementano l'interfaccia
-\verb|Callable<Tile[]>| e il metodo \verb|call()|.
-
-Il nuovo metodo \verb|solvePuzzle()|, una volta deciso quale dei due metodi è
-più conveniente adottare per il puzzle ricevuto in input, crea un thread pool
-tramite l'oggetto \verb|ExecutionService| e gli assegna tanti \emph{task} quante
-sono le righe o le colonne da risolvere.
-
-Dopo aver invocato il pool, il metodo si prepara a raccogliere i risultati, che
-saranno accessibili tramite l'interfaccia \verb|Future<Tile[]>|. Questo è
-possibile in quanto il metodo \verb|call()| di RowSolverTask e ColumnSolverTask
-è in grado di ritornare un oggetto di tipo \verb|Tile[]|, che corrisponde alla
-riga o alla colonna risolta. Il thread pool non fa altro che raccogliere questi
-risultati man mano che vengono prodotti dai thread in esecuzione e renderli
-accessibili tramite \verb|Future|.
-
-In questo modo, i risultati ritornano automaticamente nello stesso ordine con
-cui erano stati lanciati e, nel caso un thread stia ancora lavorando a un task
-necessario, il flusso di controllo di \verb|solvePuzzle()| viene automaticamente
-sospeso fino alla disponibilità dei dati.
-
-Così facendo non è necessario aspettare che tutte le righe o le colonne vengano
-risolte, ma solo che diventino disponibili quelle immediatamente necessarie per
-iniziare a costruire il puzzle, aumentando l'efficienza. Una volta ricostruito
-completamente, viene restituito tramite un oggetto che implementa l'interfaccia
-\verb|Puzzle|.
-
-Un altro vantaggio dell'uso di un thread pool riguarda le prestazioni in quanto
-si riducono gli \emph{overhead} dovuti alla creazione e alla gestione di thread
-singoli.
-
-La dimensione del pool, come suggerito da \cite{goetz2006java}, è proporzionale
-al numero di \emph{core} della macchina in cui viene eseguito il programma. In
-particolare, una \emph{best practice} proveniente da un'ulteriore ricerca in
-Rete suggerisce, per ottimizzare la concorrenza, di impostare la grandezza del
-thread pool nel seguente modo.
-
-\[ \text{grandezza thread pool} = \text{numero core} + 1 \]
-
-Da prove eseguite personalmente, le prestazioni effettivamente aumentano per via
-di una maggiore efficienza dello scambio di task all'interno del pool.
-
-Si parlerà successivamente della sicurezza nella concorrenza di questa soluzione
-in quanto abbiamo prima bisogno d'introdurre la struttura dati utilizzata.
-
-\subsection{Cambio di struttura dati}
-\label{struttura-dati}
-
-In questa parte del progetto, la precedente \verb|HashMap| è stata sostituita da
-una \verb|ConcurrentHashMap|. Così facendo, la struttura dati diventa
-perfettamente \emph{thread-safe} ed impedisce eventuali inconsistenze quando
-l'algoritmo rimuove pezzi appena trovati.
-
-Tuttavia, \verb|ConcurrentHashMap| necessita di qualche ottimizzazione.
-Infatti, per default, essa organizza la sua struttura interna per un livello
-molto alto di concorrenza, troppo per le caratteristiche di questa soluzione del
-progetto. Per cui, è necessario abbassare quest'impostazione di concorrenza per
-poter godere di un'ottima sicurezza senza rinunciare alle prestazioni.
-
-C'erano altre soluzioni possibili, come modificare l'algoritmo perché non
-cancellasse i pezzi trovati, in modo da poter usare una semplice \verb|HashMap|
-in sola lettura, oppure ricorrere a \emph{lock} tramite blocchi
-\verb|synchronized| ma sono state scartate perché giudicate poco utili al fine
-di incrementare la concorrenza del software. Non si escludono tuttavia modifiche
-nella terza parte.
-
-\subsection{Gestione delle eccezioni}
-Anche nell'ambiente concorrente della classe \verb|PuzzleBuilder| rimangono le
-eccezioni introdotte nella parte precedente e vengono introdotte quelle tipiche
-della concorrenza, come \verb|InterruptedException|. Per analizzarle al meglio,
-è bene distinguere tra eccezioni dovute a un errore nella ricerca di una
-soluzione del puzzle e eccezioni relative ad altri errori.
-
-\subsubsection{Errori nella risoluzione di un puzzle}
-All'interno di \verb|PuzzleBuilder| l'eccezione che segnala un errore nella
-risoluzione di un puzzle può essere lanciata entro tre contesti:
-\begin{itemize}
-\item la ricerca dell'elemento in alto a sinistra del puzzle;
-\item la risoluzione di una riga;
-\item la risoluzione di una colonna.
-\end{itemize}
-
-In tutti e tre i casi, se l'eccezione viene lanciata, allora è valida una delle
-seguenti condizioni.
-
-\begin{itemize}
-\item nel caso di ricerca dell'elemento \emph{top-left}, significa che non è
-stato trovato, rendendo il puzzle non valido;
-\item nel caso di risoluzione di riga o di colonna, significa che non è stato
-trovato il pezzo del puzzle successivo alla sequenza fino a quel momento
-costruita e che quindi non è possibile completarla e il puzzle non è valido.
-\end{itemize}
-
-Questi sono le uniche situazioni in cui l'algoritmo non può completare il puzzle
-e l'eccezione \verb|UnsolvablePuzzleException| viene lanciata.
-
-L'errore descritto nell'ultima situazione può verificarsi anche all'interno di
-un thread. Tuttavia, ciò non costituisce un problema perché l'eccezione verrà
-propagata dal metodo \verb|call()| dell'interfaccia \verb|Callable| e verrà
-intercettato dal metodo \verb|solvePuzzle()| sotto forma di
-\verb|ExecutionException|.
-
-A questo punto, l'eccezione viene verificata: se risulta il segnale di puzzle
-non valido, viene spedita fuori dal metodo per avvisare chi lo ha invocato.
-Altrimenti, viene stampato un generico messaggio di errore e il programma viene
-terminato.
-
-\subsubsection{Altri errori}
-
-Nel caso di altri errori nell'esecuzione di un thread, verrà lanciata
-un'estensione del tipo \verb|InterruptedException|. In questo caso viene
-stampato un messaggio d'errore e il programma viene terminato.
-
-\subsection{Modifiche minori}
-Oltre alle modifiche già riportate, si segnala:
-\begin{itemize}
-\item riscrittura del metodo \verb|equals()| della classe \verb|PSTile|
-secondo i consigli e le indicazioni riportati da \cite{bloch2008effective};
-\item irrobustimento e ottimizzazione generale del codice tramite analisi
-statica eseguita dal software FindBugs (http://findbugs.sourceforge.net).
-\end{itemize}
-
-\section{Sicurezza del codice concorrente}
-Essendo la nuova struttura dati citata nella sezione \ref{struttura-dati} perfettamente \emph{thread-safe}, non è necessario sincronizzare gli accessi ad
-essa. Per cui, non ci saranno né attese attive né \emph{deadlock}.
-
-Per dimostrare l'assenza di interferenze, è bene distinguere il caso di puzzle
-valido e puzzlenon valido.
-
-\subsection{Interferenze in caso di puzzle valido}
-Non possono esserci interferenze in caso di puzzle valido in quanto ogni thread
-ricostruirà una riga o una colonna senza produrre effetti collaterale per gli
-altri, in quanto non si \emph{incroceranno} mai.
-
-\subsection{Interferenze in caso di puzzle non valido}
-Un puzzle non valido prevede almeno una qualsiasi coordinata sbagliata in un
-pezzo. Nel caso banale che essa sia un riferimento a un pezzo inesistente, la
-chiamata \verb|get()| alla struttura dati ritornerà un riferimento vuoto,
-segnale per far scattare l'eccezione di puzzle non valido.
-
-Nel caso invece che la coordinata sbagliata sia un riferimento a un pezzo $p$
-che non sta nella stessa riga o colonna (a seconda del metodo di risoluzione),
-allora esisterà un altro thread con il quale ci saranno interferenze da $p$ fino
-alla fine della riga (o della colonna).
-
-Anche sapendo che \verb|ConcurrentHashMap| non pone \emph{lock} in lettura, a
-livello probabilistico è piuttosto debole la possibilità che due thread che si
-trovino in questa situazione possano proseguire insieme fino alla fine. Tuttavia
-per ottenere la certezza assoluta è stato aggiunto un controllo sulla rimozione.
-
-\section{Test effettuati}
-
-Rispetto alla parte precedente, è stato notevolmente migliorato il generatore di
-puzzle. Inoltre, sono stati creati alcuni \strong{test di unità} per eseguire
-verifiche su alcuni componenti critiche del software.
-
-Grazie al generatore di puzzle, sono stati svolti anche test prestazionali, o
-\emph{benchmark}, per ottenere alcune misurazioni utili a verificare quali
-soluzioni concorrenti potessero portare più benefici. A questo proposito è stato
-creato un piccolo programma Java che automatizzasse questa procedura (
-\verb|PuzzleBenchmark|).
-
-\bibliographystyle{plainnat}
-\bibliography{bibliography}
 \end{document}
