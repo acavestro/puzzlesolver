@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.AccessException;
+import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
@@ -80,16 +81,21 @@ public class PuzzleSolverClient {
       clientId = remoteSolver.attachErrorMessageBuffer(exceptionBuffer);
     } catch (final RemoteException re) {
       // TODO gestire questa eccezione
-      re.printStackTrace();
+      // re.printStackTrace();
     }
 
     Puzzle out = null;
     try {
       out = remoteSolver.solvePuzzle(m, clientId);
-    } catch (final RemoteException re) {
+    } catch (final ConnectException ce) {
+      // TODO exit or retry?
       System.out
       .println("Error: connection to the server has ben lost while"
           + " it was solving the puzzle..");
+    } catch (final RemoteException re) {
+      System.out
+      .println("Error: something happened to the server, solving request has"
+          + "been failed..");
       // TODO implementare meccanismo di retry
     }
 
