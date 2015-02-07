@@ -98,8 +98,7 @@ public class PuzzleSolverClient {
         System.out.println("Critical error: "
             + exceptionBuffer.getMessage());
       } catch (final RemoteException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        // Local object, I suppose I can ignore this catch
       }
       System.out.println("Exiting..");
       System.exit(-1);
@@ -108,8 +107,7 @@ public class PuzzleSolverClient {
     try {
       UnicastRemoteObject.unexportObject(exceptionBuffer, true);
     } catch (final NoSuchObjectException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+      // If there's no such object to unexport, all the better.
     }
 
     final String solution = out.toLine() + "\n" + "\n" + out.toMatrix()

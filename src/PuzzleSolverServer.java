@@ -3,14 +3,11 @@ import java.rmi.AccessException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
-import javax.naming.NamingException;
-
 import unipd.cs.p3.puzzlesolver.netutils.RemoteSolver;
 import unipd.cs.p3.puzzlesolver.netutils.Solver;
 
 public class PuzzleSolverServer {
-  public static void main(String args[]) throws NamingException,
-  RemoteException, MalformedURLException {
+  public static void main(String args[]) {
 
     if (args.length != 1) {
       System.out.println("Usage: ./puzzlesolverserver.sh SERVER_NAME");
@@ -19,10 +16,8 @@ public class PuzzleSolverServer {
 
     final String serverName = args[0] + ":1099";
 
-    // TODO questo coso deve gestire RemoteException e MalformedURL
-    // Capire se posso lasciarla in throws o gestirla.
-    final Solver ns = new RemoteSolver();
     try {
+      final Solver ns = new RemoteSolver();
       Naming.rebind("rmi://" + serverName + "/remotesolver", ns);
     } catch (final AccessException ae) {
       System.out
@@ -31,7 +26,7 @@ public class PuzzleSolverServer {
       System.exit(-1);
     } catch (final RemoteException re) {
       System.out
-          .println("Error: rmi registry could not be contacted..");
+      .println("Error: rmi registry could not be contacted..");
       // TODO implementare meccanismo di retry.
     } catch (final MalformedURLException mue) {
       System.out

@@ -26,7 +26,7 @@ public class RemoteSolver extends UnicastRemoteObject implements Solver {
     final PuzzleBuilder pb = new PuzzleBuilder(tiles);
     try {
       final Puzzle p = pb.solvePuzzle();
-      // observers.remove(clientId);
+
       synchronized (exceptionBuffers) {
         exceptionBuffers.remove(clientId);
       }
