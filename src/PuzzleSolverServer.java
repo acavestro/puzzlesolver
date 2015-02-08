@@ -22,17 +22,18 @@ public class PuzzleSolverServer {
     } catch (final AccessException ae) {
       System.out
       .println("Critical error: server can't contact rmi server due"
-              + " to a permission error.");
+          + " to a permission error.");
       System.out.println("Aborting..");
       System.exit(-1);
     } catch (final RemoteException re) {
       System.out
       .println("Error: rmi registry could not be contacted..");
-      // TODO implementare meccanismo di retry.
+      System.out.println("Aborting..");
+      System.exit(-1);
     } catch (final MalformedURLException mue) {
       System.out
       .println("Critical error: server is using a malformed url to"
-              + " contact rmi registry.");
+          + " contact rmi registry.");
       System.out.println("Aborting..");
       System.exit(-1);
     }

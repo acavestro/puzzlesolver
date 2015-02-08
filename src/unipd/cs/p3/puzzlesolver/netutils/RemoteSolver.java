@@ -8,7 +8,6 @@ import unipd.cs.p3.puzzlesolver.puzzle.Puzzle;
 import unipd.cs.p3.puzzlesolver.puzzle.PuzzleBuilder;
 import unipd.cs.p3.puzzlesolver.tile.Tile;
 
-// TODO Questa classe andrebbe singleton, ma non trovo modi carini per farlo
 public class RemoteSolver extends UnicastRemoteObject implements Solver {
 
   public RemoteSolver() throws RemoteException {

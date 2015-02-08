@@ -19,45 +19,52 @@ class PSTile implements Tile {
     this.idRight = idRight;    
   } 
 
+  @Override
   public String getUp() {
     return idUp;
   }
+  @Override
   public String getDown(){
     return idDown;
   }
+  @Override
   public String getLeft(){
     return idLeft;
   }
+  @Override
   public String getRight(){
     return idRight;
   }
 
+  @Override
   public String getID(){
     return id;
   }
 
+  @Override
   public String toSymbol(){
     return symbol;
   }  
 
+  @Override
   public String toString(){
     return toSymbol();
   }
-  
-  // TODO inserire in changelog
-  // Attieni metodo equals a contratto definito da Java
 
   @Override
   public boolean equals(Object o){
-    if (this == o)
+    if (this == o) {
       return true;
-    if (!(o instanceof Tile))
+    }
+    if (!(o instanceof Tile)) {
       return false;
+    }
     
-    Tile t = (Tile) o;
+    final Tile t = (Tile) o;
     return id.equals(t.getID());
   }
 
+  @Override
   public int hashCode(){
     return id.hashCode();
   }

@@ -54,23 +54,24 @@ public class PuzzleSolverClient {
     } catch (final NotBoundException nbe) {
       System.out
       .println("Critical error: remotesolver object is not bound on the"
-              + " rmi server.");
+          + " rmi server.");
       System.out.println("Aborting..");
       System.exit(-1);
     } catch (final AccessException ae) {
       System.out
       .println("Critical error: client can't contact rmi server due"
-              + " to a permission error.");
+          + " to a permission error.");
       System.out.println("Aborting..");
       System.exit(-1);
     } catch (final RemoteException re) {
       System.out
       .println("Error: rmi registry could not be contacted..");
-      // TODO implementare meccanismo di retry.
+      System.out.println("Aborting..");
+      System.exit(-1);
     } catch (final MalformedURLException mue) {
       System.out
       .println("Critical error: client is using a malformed url to"
-              + " contact rmi registry.");
+          + " contact rmi registry.");
       System.out.println("Aborting..");
       System.exit(-1);
     }
@@ -79,15 +80,17 @@ public class PuzzleSolverClient {
     try {
       out = remoteSolver.solvePuzzle(m);
     } catch (final ConnectException ce) {
-      // TODO exit or retry?
       System.out
       .println("Error: connection to the server has ben lost while"
           + " it was solving the puzzle..");
+      System.out.println("Aborting..");
+      System.exit(-1);
     } catch (final RemoteException re) {
       System.out
-      .println("Error: something happened to the server, solving request has"
+          .println("Error: something happened to the server, solving request has "
           + "been failed..");
-      // TODO implementare meccanismo di retry
+      System.out.println("Aborting..");
+      System.exit(-1);
     }
 
     /*
