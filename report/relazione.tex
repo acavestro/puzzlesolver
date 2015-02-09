@@ -30,6 +30,34 @@ il problema e rispedire al client la soluzione.
 Nella seguente relazione, allegata al progetto, verranno introdotte e discusse
 tutte le scelte progettuali compiute per lo sviluppo di questa terza parte.
 
+\subsection{Note su sviluppo e avvio}
+\subsubsection{Script di avvio}
+Sono presenti i seguenti script:
+\begin{itemize}
+\item \verb|startrmiregistry.sh|: avvia il registro RMI;
+\item \verb|puzzlesolverclient.sh|: avvia il client, da invocare come da
+specifica;
+\item \verb|puzzlesolverserver.sh|: avvia il registro RMI e il server, da
+invocare come da specifica;
+\item \verb|puzzlesolverserverwr.sh|: avvia il server senza avviare il registro
+RMI, anche quest'ultimo da invocare come da specifica.
+\end{itemize}
+\subsubsection{Cartelle rilevanti}
+\begin{itemize}
+\item \verb|src|: contiene i file sorgenti;
+\item \verb|build|,: viene creata durante la compilazione, contiene i file
+compilati.
+\end{itemize}
+\subsection{Ambiente di sviluppo}
+Il software, oltre ad essere testato sulle macchine del laboratorio presso il
+plesso Paolotti, dotate di Java 7, è stato sviluppato e testato anche nel
+seguente ambiente:
+\begin{itemize}
+\item \textbf{Sistema operativo:} Mac OS X v 10.10.2;
+\item \textbf{IDE:} Eclipse 4.4.1;
+\item \textbf{Java:} 1.8.0\_25.
+\end{itemize}
+
 \section{Introduzione all'algoritmo distribuito}
 \subsection{Parsing del file di input}
 Il parsing del file di input è compito della classe \verb|TileParser|, già
