@@ -1,4 +1,5 @@
 \documentclass[a4paper, 12pt]{article}
+\usepackage{fullpage}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{hyperref}
@@ -29,24 +30,221 @@ il problema e rispedire al client la soluzione.
 Nella seguente relazione, allegata al progetto, verranno introdotte e discusse
 tutte le scelte progettuali compiute per lo sviluppo di questa terza parte.
 
-%\section{Introduzione all'algoritmo distribuito}
-%\subsection{Parsing del file di input}
-%\subsection{Risoluzione del puzzle}
-%\subsection{Output}
+\section{Introduzione all'algoritmo distribuito}
+\subsection{Parsing del file di input}
+Il parsing del file di input è compito della classe \verb|TileParser|, già
+esistente nelle precedenti parti del progetto. Viene costruita con la stringa
+contenente il percorso del file e restituisce una struttura dati di tipo
+\verb|ConcurrentHashMap|. Quest'ultima viene poi spedita al server
+per la risoluzione del puzzle.
+\subsection{Risoluzione del puzzle}
+Il server esegue la risoluzione del puzzle tramite l'oggetto
+\verb|PuzzleBuilder|, costruito nelle parti precedenti e ottimizzato per trovare
+la soluzione in maniera concorrente. Una volta terminato, la risposta viene
+spedita al client, incapsulando informazioni sul processo risolutivo,
+l'eventuale soluzione o l'eventuale errore (nella sezione \ref{server-response}
+verrà approfondita questa parte).
+\subsection{Output}
+Il client riceve la risposta con la quale costruisce il file di output oppure
+visualizza un messaggio di errore.
 
-%\section{Cambiamenti a codice e gerarchia}
+\section{Cambiamenti a codice e gerarchia}
+\subsection{PuzzleSolverClient}
+Questa classe ricalca nelle funzionalità ciò che svolgeva la classe
+\verb|PuzzleSolver| nelle precedenti parti del progetto. Essa contiene un metodo
+\verb|main| che implementa la parte client dell'algoritmo distribuito, ossia
+tenta di:
+\begin{enumerate}
+\item leggere il file di input e di estrarne i pezzi tramite \emph{parsing};
+\item ottenere dal server l'oggetto risolutore remoto;
+\item richiedere al suddetto la risoluzione del puzzle, spedendogli i pezzi
+estratti;
+\item ottenere la risposta, salvare su output o restituire un messaggio di
+errore.
+\end{enumerate}
+\subsection{PuzzleSolverServer}
+È il \verb|main| principale del programma lato server. Il suo unico ma
+fondamentale scopo è collegare l'oggetto risolutore al registro RMI, perché sia
+raggiungibile da ogni client interessato.
+\subsection{Package netutils}
+Questo package contiene tutte le interfacce e gli oggetti interessati
+alla distribuzione dell'applicazione.
+\subsubsection{Solver}
+Interfaccia che estende \strong{Remote}, è il tipo di oggetto che il client si
+aspetta come risolutore remoto. Contiene il seguente metodo:
+\begin{itemize}
+\item \verb|public SolverResponse solvePuzzle(ConcurrentHashMap<String, Tile>)|:
+\\ definisce la risoluzione di un puzzle e richiede come parametro la
+struttura dati che contiene i vari pezzi. Ritorna un oggetto che incapsula la
+risposta del server e può lanciare eccezioni del tipo \verb|RemoteException|.
+\end{itemize}
+\subsubsection{RemoteSolver}
+Implementa l'interfaccia \verb|Solver| ed estende la classe
+\verb|UnicastRemoteObject|. Contiene il seguente metodo:
+\begin{itemize}
+\item \verb|public SolverResponse solvePuzzle(ConcurrentHashMap<String, Tile>)|:
+\\ è l'\emph{override} del metodo dell'interfaccia \verb|Solver|. Crea un
+oggetto \verb|PuzzleBuilder| a cui affida la struttura dati con i vari pezzi e
+ne richiede la soluzione. Infine, impacchetta l'oggetto di risposta di tipo
+\verb|SolverResponse| e lo restituisce.
+\end{itemize}
+\subsubsection{SolutionStatus}
+Si tratta di un \verb|enum| che indica i possibili esiti di un processo di
+risoluzione di un puzzle. Essi sono:
+\begin{itemize}
+\item \verb|SOLVED|: puzzle risolto con successo;
+\item \verb|ERROR|: puzzle non risolto.
+\end{itemize}
+Fa parte delle informazioni incapsulate da oggetti di tipo \verb|SolverResponse|
+e serve al client per capire se può lavorare all'output del puzzle o gestire
+degli errori.
+\subsubsection{SolverResponse}
+Interfaccia che definisce la struttura di una risposta del server. Estende
+\strong{Serializable} e definisce i seguenti metodi:
+\begin{itemize}
+\item \verb|public SolutionStatus getStatus()|: ottiene l'oggetto di tipo
+\verb|SolutionStatus| che contiene lo stato della risoluzione;
+\item \verb|public Puzzle getSolution()|: ottiene la soluzione del Puzzle (se
+esiste);
+\item \verb|public Exception getError()|: ottiene errori di risoluzione (se ci
+sono stati).
+\end{itemize}
+\subsubsection{RemoteSolverResponse}
+Classe che implementa l'interfaccia \verb|SolverResponse| e ne fa
+l'\emph{ovveride} dei metodi. Si limita semplicemente a raccogliere, tramite il
+suo costrutture, tre oggetti:
+\begin{itemize}
+\item un oggetto \verb|SolutionStatus| che contiene lo stato della risoluzione;
+\item un oggetto \verb|Puzzle| che contiene l'eventuale soluzione;
+\item un oggetto \verb|Exception| che contiene l'eventuale errore.
+\end{itemize}
 
-%\section{Comunicazione client-server}
-%\subsection{Oggetti nel registro RMI}
-%\subsection{Richiesta di risoluzione}
-%\subsection{Risposta}
-%\subsection{Eventuali errori di risoluzione}
+\section{Comunicazione client-server}
+Il protocollo di comunicazione client-server si basa su:
+\begin{itemize}
+\item un oggetto collegato al registro RMI che permette al client di avviare una
+risoluzione;
+\item una struttura dati contenente i pezzi dal puzzle, da spedire al server
+per mezzo dell'oggetto elencato precedentemente;
+\item un oggetto di risposta che il server, dopo aver salvato al suo interno
+dati e informazioni sul lavoro svolto, spedisce al client.
+\end{itemize}
 
-%\section{Robustezza del software}
-%\subsection{Client}
-%\subsection{Server}
-%\subsection{Registro RMI}
+Nelle successive sottosezioni verranno analizzati i passaggi che portano allo
+scambio di questi oggetti attraverso la rete.
 
-%\section{Altre modifiche}
+\subsection{Oggetti nel registro RMI}
+Al registro RMI viene collegata un'istanza della classe \verb|RemoteSolver|, che
+viene recuperata dal client con il tipo dell'interfaccia, \verb|Solver|.
+Quest'ultima implementa \verb|Remote|, per cui al richiedente viene fornito un
+riferimento remoto, ossia uno \emph{stub}. La classe \verb|RemoteSolver| non
+contiene campi dati, per cui non viene trasferito alcun altro oggetto.
+\subsection{Richiesta di risoluzione}
+La richiesta di risoluzione da parte di un client, attraverso la chiamata del
+metodo \verb|solvePuzzle| dell'oggetto \verb|Solver|, comporta la creazione
+nella JVM remota del server di un \emph{thread} che esegue il codice del
+metodo chiamato.
 
+A \verb|solvePuzzle| viene passata come parametro una \verb|ConcurrentHashMap|,
+la quale classe implementa l'interfaccia \verb|Serializable|. Stessa cosa per
+\verb|Tile|, interfaccia di oggetti di cui la struttura dati è contenitrice. Per
+cui, al server viene mandata un'intera copia dell'insieme dei pezzi.
+
+In questo modo il metodo remoto non viene rallentato da continue richieste di
+accesso ai dati originali contenuti nella JVM del client.
+\subsection{Risposta}
+\label{server-response}
+Il metodo remoto \verb|solvePuzzle| invocato dal client tenta di risolvere il
+puzzle tramite un oggetto \verb|PuzzleBuilder|. A seconda se quest'ultimo
+restituisce un \verb|Puzzle| o lancia un'eccezione, il metodo costruisce la
+risposta \verb|SolverResponse|:
+\begin{enumerate}
+\item se la risoluzione va a buon fine, ossia la chiamata al metodo
+\verb|solvePuzzle| di \verb|PuzzleBuilder| torna un oggetto \verb|Puzzle|, la
+risposta viene costruita impostando a \verb|SOLVED| lo stato e a \verb|NULL| il
+campo errore, allegando inoltre la soluzione;
+\item se la chiamata fallisce in quanto viene lanciata un'eccezione, la risposta
+ha come stato \verb|ERROR|, la soluzione è pari a \verb|NULL| e il campo
+errore contiene la stessa eccezione lanciata.
+\end{enumerate}
+
+Da notare che al client torna in ogni caso una copia esatta della risposta
+formulata dal server, in quanto \verb|SolverResponse| estende l'interfaccia
+\verb|Serializable| e contiene tutti oggetti a loro volta serializzabili:
+\begin{itemize}
+\item gli attributi \verb|enum| ed \verb|Exception| lo sono per specifica del
+linguaggio;
+\item l'attributo \verb|Puzzle| estende a sua volta l'interfaccia
+\verb|Serializable| e così fanno a sua volta i suoi campi dati (\verb|Tile|
+compreso).
+\end{itemize}
+\subsection{Eventuali errori di risoluzione}
+Una volta che il client ha ricevuto la risposta, controlla il campo riguardante
+lo stato: se il suo valore è \verb|SOLVED| allora può stampare l'output
+utilizzando l'oggetto \verb|Puzzle| del campo soluzione. Altrimenti, se lo stato
+corrisponde a \verb|ERROR|, stampa a video che la risoluzione non è andata a
+buon fine allegando le informazioni contenute nell'eccezione del campo errore
+della risposta.
+
+Si noti inoltre che, per via della robustezza del client (sezione
+\ref{robust-client}), esso sa per certo che la soluzione è ben definita e
+mai \verb|NULL|. Questo perché può esserlo soltanto nel caso in cui il server
+smetta di rispondere (ad esempio per via di un \emph{crash}), cosa che non può
+succedere in quanto si tratta di un caso gestito tramite ascolto delle eccezioni
+(es \verb|RemoteException|) durante la ricezione della risposta.
+
+\section{Robustezza del software}
+\subsection{Client}
+\label{robust-client}
+Il client necessita della rete in due occasioni: il \emph{lookup} dell'oggetto
+remoto di tipo \verb|Solver| e la richiesta di risoluzione del puzzle. In
+entrambi i casi, vengono gestite tutte le eccezioni eventualmente lanciate dalle
+chiamate remote, bloccando il programma per evitare che prosegua in stati
+inconsistenti, ossia che:
+\begin{itemize}
+\item il riferimento all'oggetto \verb|Solver| sia vuoto (\verb|NULL|),
+provocando un errore al momento della richiesta di risoluzione;
+\item il riferimento alla soluzione \verb|SolverResponse| sia vuoto, provocando
+un errore al momento dell'analisi della risposta.
+\end{itemize}
+
+Il blocco del programma in tutte le possibilità in cui si verifica uno stato
+inconsistente è stato scelto per mantenere il codice semplice e facilmente
+manutenibile. Così facendo s'introducono postcondizioni all'uscita dalle
+chiamate remote che facilitano il lavoro del programmatore, a patto di essere
+ben documentate.
+\subsection{Server}
+Il server si collega alla rete nel momento in cui condivide il suo oggetto
+\verb|Solver|. Successivamente, rimane in attesa di una chiamata da qualche
+client, la quale esegue il metodo richiesto su un \emph{thread} separato.
+
+La condivisione dell'oggetto remoto da parte del server è protetta, come nel
+client, da un blocco \emph{try-catch} che impedisce l'avanzamento del
+programma in caso di fallimento del \emph{bind} di \verb|Solver|.
+
+Inoltre, nel caso di un \emph{crash} da parte di un client, il server non
+subisce alcun malfunzionamento. Il metodo \verb|solvePuzzle| di \verb|Solver| è
+\emph{idempotente}, ossia può essere chiamato ripetutamente senza causare
+interferenze o incoerenze nei cambi di stato.
+\subsection{Registro RMI}
+Nel caso in cui il registro RMI non fosse raggiungibile dalla rete, sia il
+client che il server non possono accedervi e visualizzano a schermo un
+relativo messaggio di errore. Non è previsto che il server debba
+\emph{accorgersi} di una irraggiunbilità del registro finché si trova in
+esecuzione.
+\section{Note sulla robustezza}
+Esistono metodologie di gestione dei fallimenti di rete che non sono state
+implementate nel progetto per mancanza di tempo e risorse. In particolare,
+esistono eccezioni che consentono di tentare il recupero della connessione.
+
+Ad esempio, quando il client tenta il recupero dell'oggetto remoto
+\verb|Solver| potrebbe, in caso di fallimento e conseguente lancio
+dell'eccezione \verb|RemoteException|, mettersi in attesa per un tempo fissato e
+poi riprovare un numero finito di volte prima di \emph{rinunciare}.
+
+Per evitare ripetizioni del codice ogni volta in cui ci si trova in presenza di
+una chiamata a un metodo remoto, si potrebbe implementare un pattern
+\emph{strategy} a cui passare il controllo delle suddette chiamate.
+Quest'approccio favorisce l'estendibilità del codice in quanto permette di
+cambiare nel tempo le modalità di gestione della connesione di rete.
 \end{document}
